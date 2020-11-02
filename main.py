@@ -16,7 +16,8 @@ import pyperclip
 import requests
 import speech_recognition as sr
 import wikipedia
-import win32clipboard
+# import win32clipboard
+# from ctypes import windll
 from fast_youtube_search import search_youtube
 from googleapiclient.discovery import build
 from googletrans import Translator
@@ -24,12 +25,13 @@ from gtts import gTTS
 from playsound import playsound
 from pynput import keyboard, mouse
 from pynput.keyboard import Controller, Key
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import *
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 from youtube_search import YoutubeSearch
 
 from mainwindow import Ui_MainWindow
+
 
 drive = "C:/"
 
@@ -181,6 +183,7 @@ class assistant():
             self.translation()
         else:
             self.searchDefault(text)
+
     # ================================= ASSISTANT FUNCTIONS =================================== #
 
     # 1. Trợ giúp
@@ -478,15 +481,21 @@ class assistant():
         worker.signals.result.connect(self.translationComplete)
         self.threadpool.start(worker)
         self.setPlainTextEdit("Chọn từ hoặc câu để dịch sang tiếng Việt.")
+        self.MainWindow.showMinimized()
 
     def translateGG(self):
         keyboard = Controller()
         translator = Translator()
 
-        def clearClipboard():
-            win32clipboard.OpenClipboard()
-            win32clipboard.EmptyClipboard()
-            win32clipboard.CloseClipboard()
+        # def clearClipboard():
+        #     win32clipboard.OpenClipboard()
+        #     win32clipboard.EmptyClipboard()
+        #     win32clipboard.CloseClipboard()
+
+        # def clearClb():
+        #     if windll.user32.OpenClipboard(None):
+        #         windll.user32.EmptyClipboard()
+        #         windll.user32.CloseClipboard()
 
         def on_click(x, y, button, pressed):
             if not pressed:
@@ -497,13 +506,11 @@ class assistant():
                 time.sleep(0.05)
                 return False  # False to stop listener
 
-        oldClipboard = pyperclip.paste()
         with mouse.Listener(on_click=on_click) as mouseListener:
             mouseListener.join()
-        newClipboard = pyperclip.paste()
-        if newClipboard != oldClipboard:
-            result = translator.translate(newClipboard, dest="vi")
-            clearClipboard()
+        strFromClipBoard = pyperclip.paste()
+        pyperclip.copy("")
+        result = translator.translate(strFromClipBoard, dest="vi")
 
         content = "[src] {0}\n[origin] {1}\n\n[dest] {2}\n[translate] {3}".format(
             result.src, result.origin, result.dest, result.text)
@@ -512,6 +519,7 @@ class assistant():
     def translationComplete(self, text):
         self.setPlainTextEdit(text)
         self.speak("Đã dịch xong.")
+        self.MainWindow.showNormal()
 
 
 # ================================ FUNCITON MAIN ==================================== #

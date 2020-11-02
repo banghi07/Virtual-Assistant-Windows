@@ -32,8 +32,8 @@ from youtube_search import YoutubeSearch
 
 from mainwindow import Ui_MainWindow
 
-
 drive = "C:/"
+chain = []
 
 
 def findApp(name, path):
@@ -76,6 +76,30 @@ class thread(QRunnable):
             self.signals.finished.emit()  # Done
 
 
+# ? Thead riêng tạm thời cho function dictionary (sử dụng vòng lặp while True)
+class threadDSignals(QObject):
+    result = pyqtSignal(object)
+
+
+class threadD(QRunnable):
+    def __init__(self, fn, *args, **kwargs):
+        super(threadD, self).__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = threadDSignals()
+
+    @pyqtSlot()
+    def run(self):
+        while True:
+            try:
+                result = self.fn(*self.args, **self.kwargs)
+                self.signals.result.emit(result)
+            except:
+                self.run()
+                break
+
+
 class assistant():
     def __init__(self):
         app = QtWidgets.QApplication(sys.argv)
@@ -88,7 +112,7 @@ class assistant():
         self.MainWindow.show()
         sys.exit(app.exec_())
 
-    # ================================ SET & GET FUNCTIONS ==================================== #
+    #* ================================ SET & GET FUNCTIONS ==================================== #
 
     # Đặt title cho dialog
     def setWidgets(self):
@@ -143,7 +167,7 @@ class assistant():
                 self.setLabel("...")
                 return "none"
 
-   # ================================ CALL ASSISTANT ==================================== #
+   #* ================================ CALL ASSISTANT ==================================== #
 
     # Khởi tạo ban đầu
     def initialAssistant(self):
@@ -180,11 +204,11 @@ class assistant():
             else:
                 self.openApplication(text)
         elif "từ điển" in text:
-            self.translation()
+            self.dictionary()
         else:
             self.searchDefault(text)
 
-    # ================================= ASSISTANT FUNCTIONS =================================== #
+    #* ================================= ASSISTANT FUNCTIONS =================================== #
 
     # 1. Trợ giúp
     def helpMe(self):
@@ -473,55 +497,60 @@ class assistant():
         self.speak(result["string"])
 
     # 11. Dịch nghĩa sang tiếng Việt
-    def translation(self):
+    def dictionary(self):
         self.translateThread()
 
     def translateThread(self):
-        worker = thread(self.translateGG, 0)
-        worker.signals.result.connect(self.translationComplete)
+        worker = threadD(self.translate)
+        worker.signals.result.connect(self.setPlainTextEdit)
+        self.setPlainTextEdit("Đã bật từ điển.")
         self.threadpool.start(worker)
-        self.setPlainTextEdit("Chọn từ hoặc câu để dịch sang tiếng Việt.")
-        self.MainWindow.showMinimized()
 
-    def translateGG(self):
+    def translate(self):
         keyboard = Controller()
         translator = Translator()
+        result = ""
 
-        # def clearClipboard():
-        #     win32clipboard.OpenClipboard()
-        #     win32clipboard.EmptyClipboard()
-        #     win32clipboard.CloseClipboard()
-
-        # def clearClb():
-        #     if windll.user32.OpenClipboard(None):
-        #         windll.user32.EmptyClipboard()
-        #         windll.user32.CloseClipboard()
+        def on_move(x, y):
+            global chain
+            chain.append(2)
 
         def on_click(x, y, button, pressed):
-            if not pressed:
-                keyboard.press(Key.ctrl)
-                keyboard.press("c")
-                keyboard.release(Key.ctrl)
-                keyboard.release("c")
-                time.sleep(0.05)
-                return False  # False to stop listener
+            global chain
+            if pressed:
+                chain.append(1)
+            else:
+                chain.append(3)
+                return False
 
-        with mouse.Listener(on_click=on_click) as mouseListener:
+        with mouse.Listener(on_move=on_move, on_click=on_click) as mouseListener:
             mouseListener.join()
-        strFromClipBoard = pyperclip.paste()
-        pyperclip.copy("")
-        result = translator.translate(strFromClipBoard, dest="vi")
 
+        if chain[-2] != 1:
+            keyboard.press(Key.ctrl)
+            keyboard.press("c")
+            keyboard.release(Key.ctrl)
+            keyboard.release("c")
+            time.sleep(0.05)
+
+            strFromClipBoard = pyperclip.paste()
+
+            if strFromClipBoard != "":
+                temp = translator.translate(strFromClipBoard, dest="vi")
+                result = temp.text
+
+            pyperclip.copy("")
+
+        return result
+
+    def translateComplete(self, result):
         content = "[src] {0}\n[origin] {1}\n\n[dest] {2}\n[translate] {3}".format(
             result.src, result.origin, result.dest, result.text)
-        return content
 
-    def translationComplete(self, text):
-        self.setPlainTextEdit(text)
-        self.speak("Đã dịch xong.")
-        self.MainWindow.showNormal()
+        self.setPlainTextEdit(content)
+
+#* ================================ FUNCITON MAIN ==================================== #
 
 
-# ================================ FUNCITON MAIN ==================================== #
 if __name__ == "__main__":
     assistant()

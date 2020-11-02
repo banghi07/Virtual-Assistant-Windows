@@ -507,6 +507,7 @@ class assistant():
         self.setPlainTextEdit("Đã bật từ điển.")
         self.threadpool.start(worker)
 
+    # Todo: Ghi nhớ clipboard do user copy vào 1 biến tạm, sau khi kết thúc thì đưa lại vào clipboard
     def translate(self):
         keyboard = Controller()
         translator = Translator()

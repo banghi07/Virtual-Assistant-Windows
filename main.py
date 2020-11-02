@@ -77,6 +77,7 @@ class thread(QRunnable):
 
 
 # ? Thead riêng tạm thời cho function dictionary (sử dụng vòng lặp while True)
+# TODO thêm tính năng khi thoát phần mềm thì kill thread translate đi vì translate dùng while True
 class threadDSignals(QObject):
     result = pyqtSignal(object)
 
@@ -536,18 +537,18 @@ class assistant():
             strFromClipBoard = pyperclip.paste()
 
             if strFromClipBoard != "":
-                temp = translator.translate(strFromClipBoard, dest="vi")
-                result = temp.text
-
+                content = translator.translate(strFromClipBoard, dest="vi")
+                result = "[Nguồn] {0}\n[Đích] {1}\n[Kết quả]\n{2}".format(
+                    content.src, content.dest, content.text)
             pyperclip.copy("")
 
         return result
 
     def translateComplete(self, result):
-        content = "[src] {0}\n[origin] {1}\n\n[dest] {2}\n[translate] {3}".format(
-            result.src, result.origin, result.dest, result.text)
-
-        self.setPlainTextEdit(content)
+        if result == "":
+            pass
+        else:
+            self.setPlainTextEdit(result)
 
 #* ================================ FUNCITON MAIN ==================================== #
 

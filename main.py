@@ -19,6 +19,7 @@ import wikipedia
 # import win32clipboard
 # from ctypes import windll
 from fast_youtube_search import search_youtube
+from geopy.geocoders import Nominatim
 from googleapiclient.discovery import build
 from googletrans import Translator
 from gtts import gTTS
@@ -283,46 +284,38 @@ class assistant():
             self.response("Xin lỗi, tôi không nghe rõ bạn nói gì!")
         else:
             worker = thread(self.searchWeather, text, 0)
-            worker.signals.result.connect(self.whatWeatherComplete)
+            # worker.signals.result.connect(self.whatWeatherComplete)
             self.threadpool.start(worker)
             self.setPlainTextEdit("Đang tìm kiếm. Vui lòng đợi...")
 
     def searchWeather(self, city):
-        ow_url = "http://api.openweathermap.org/data/2.5/weather?"
-        api_key = "fe8d8c65cf345889139d8e545f57819a"
-        call_url = ow_url + "appid=" + api_key + "&q=" + city + "&units=metric"
-        response = requests.get(call_url)
-        data = response.json()
-        if data["cod"] != "404":
-            city_res = data["main"]
-            current_temperature = city_res["temp"]
-            current_pressure = city_res["pressure"]
-            ccurrent_humidity = city_res["humidity"]
-            suntime = data["sys"]
-            sunrise = datetime.datetime.fromtimestamp(suntime["sunrise"])
-            sunset = datetime.datetime.fromtimestamp(suntime["sunset"])
-            wthr = data["weather"]
-            weather_description = wthr[0]["description"]
-            now = datetime.datetime.now()
+        nameCity = city
+        geolocator = Nominatim(user_agent="Virtual Assistant")
+        location = geolocator.geocode(nameCity)
 
-            result = {
-                "content": "Ngày {day} tháng {month} năm {year}\nNhiệt độ trung bình: {temp} độ C\nÁp suất không khí: {pressure} hPa\nĐộ ẩm: {humidity}%\nDự báo: {description}.".format(
-                    city=city, day=now.day, month=now.month, year=now.year, temp=current_temperature,
-                    pressure=current_pressure, humidity=ccurrent_humidity, description=weather_description),
+        api = "4e7ced343986de64b7f54296a111c208"
+        lat = location.latitude
+        lon = location.longitude
+        part = "minutely,hourly,daily,alerts"
+        units = "m"
+        url = "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude={}&units={}&appid={}"
+        url_onecall = url.format(lat, lon, part, units, api)
+        response = requests.get(url_onecall).json()
 
-                "string": "Dự báo thời tiết {city} hôm nay".format(city=city)
-            }
-        else:
-            result = {
-                "content": "Không tìm thấy địa chỉ mà bạn nói!",
-                "string": "Không tìm thấy địa chỉ mà bạn nói!"
-            }
+        r_lat = response["lat"]
+        r_lon = response["lon"]
+        r_currentTime = response["current"]["dt"]
+        r_temp = response["current"]["temp"]
+        r_feelLike = response["current"]["feels_like"]
+        r_humidity = response["current"]["humidity"]
 
-        return result
+        print(r_currentTime, r_lat, r_lon)
+
+        # return result
 
     def whatWeatherComplete(self, result):
-        self.setPlainTextEdit(result["content"])
-        self.speak(result["string"])
+        self.setPlainTextEdit(result["current"])
+        self.speak("Đây là kết quả tìm kiếm được")
 
     # 6. Đọc báo rss news
     def readNews(self):
@@ -352,8 +345,9 @@ class assistant():
             if number > 5:
                 break
             else:
-                news = "[No.{number}]\n[Title] {title}\n[Description] {description}\n[Link] {url}\n\n".format(number=number,
-                                                                                                              title=articles["title"], description=articles["description"], url=articles["url"])
+                string = "[No.{}]\n[Title] {}\n[Description] {}\n[Link] {}\n\n"
+                news = string.format(
+                    number, articles["title"], articles["description"], articles["url"])
                 content = content + news
 
         if content == "":

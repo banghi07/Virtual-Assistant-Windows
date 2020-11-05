@@ -14,13 +14,14 @@ location = geolocator.geocode(nameCity)
 api = "4e7ced343986de64b7f54296a111c208"
 lat = location.latitude
 lon = location.longitude
+lang = "vi"
 part = "hourly,minutely,daily"
-url = "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude={}&appid={}&units={}"
-url_onecall = url.format(lat, lon, part, api, "m")
+url = "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude={}&appid={}&units={}&lang={}"
+url_onecall = url.format(lat, lon, part, api, "metric", lang)
 
 print(location.address)
-result = requests.get(url_onecall)
-pprint(result.json())
+result = requests.get(url_onecall).json()["current"]["weather"]
+pprint(result)
 
 
 """ 

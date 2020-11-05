@@ -16,29 +16,29 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(419, 310)
         MainWindow.setStyleSheet("QLabel {\n"
-"    font: 12pt \"MS Shell Dlg 2\";\n"
-"    border: 1px solid black;\n"
-"    border-radius: 5px;\n"
-"}\n"
-"\n"
-"QToolButton {\n"
-"    border: none\n"
-"}\n"
-"\n"
-"QPlainTextEdit {\n"
-"    font: 12pt \"MS Shell Dlg 2\";\n"
-"    border: 1px solid black;\n"
-"    border-radius: 5px;\n"
-"    background: transparent;\n"
-"    \n"
-"}\n"
-"\n"
-"QPushButton {\n"
-"    border: 1px solid black;\n"
-"    border-radius: 5px;\n"
-"    background-color: gray;\n"
-"}\n"
-"")
+                                 "    font: 12pt \"MS Shell Dlg 2\";\n"
+                                 "    border: 1px solid black;\n"
+                                 "    border-radius: 5px;\n"
+                                 "}\n"
+                                 "\n"
+                                 "QToolButton {\n"
+                                 "    border: none\n"
+                                 "}\n"
+                                 "\n"
+                                 "QPlainTextEdit {\n"
+                                 "    font: 12pt \"MS Shell Dlg 2\";\n"
+                                 "    border: 1px solid black;\n"
+                                 "    border-radius: 5px;\n"
+                                 "    background: transparent;\n"
+                                 "    \n"
+                                 "}\n"
+                                 "\n"
+                                 "QPushButton {\n"
+                                 "    border: 1px solid black;\n"
+                                 "    border-radius: 5px;\n"
+                                 "    background-color: gray;\n"
+                                 "}\n"
+                                 "")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -47,7 +47,8 @@ class Ui_MainWindow(object):
         self.label.setObjectName("label")
         self.plainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
         self.plainTextEdit.setGeometry(QtCore.QRect(10, 10, 400, 240))
-        self.plainTextEdit.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        self.plainTextEdit.viewport().setProperty(
+            "cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
         self.plainTextEdit.setReadOnly(True)
         self.plainTextEdit.setPlainText("")
         self.plainTextEdit.setMaximumBlockCount(0)
@@ -64,13 +65,3 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.pushButton.setText(_translate("MainWindow", "..."))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())

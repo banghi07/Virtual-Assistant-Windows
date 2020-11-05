@@ -37,26 +37,26 @@ drive = "C:/"
 chain = []
 
 
-def findApp(name, path):
+def find_app(name, path):
     for root, dirs, files in os.walk(path):
         if name in files:
             return os.path.join(root, name)
 
 
-class threadSignals(QObject):
+class ThreadSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
     result = pyqtSignal(object)
 
 
-class thread(QRunnable):
+class Thread(QRunnable):
     def __init__(self, fn, *args, **kwargs):
-        super(thread, self).__init__()
+        super(Thread, self).__init__()
         # Store constructor arguments (re-used for processing)
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
-        self.signals = threadSignals()
+        self.signals = ThreadSignals()
 
     @pyqtSlot()
     def run(self):
@@ -78,18 +78,18 @@ class thread(QRunnable):
 
 
 # ? Thead riêng tạm thời cho function dictionary (sử dụng vòng lặp while True)
-# TODO thêm tính năng khi thoát phần mềm thì kill thread translate đi vì translate dùng while True
-class threadDSignals(QObject):
+# TODO thêm tính năng khi thoát phần mềm thì kill Thread translate đi vì translate dùng while True
+class ThreadDSignals(QObject):
     result = pyqtSignal(object)
 
 
-class threadD(QRunnable):
+class ThreadD(QRunnable):
     def __init__(self, fn, *args, **kwargs):
-        super(threadD, self).__init__()
+        super(ThreadD, self).__init__()
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
-        self.signals = threadDSignals()
+        self.signals = ThreadDSignals()
 
     @pyqtSlot()
     def run(self):
@@ -102,38 +102,38 @@ class threadD(QRunnable):
                 break
 
 
-class assistant():
+class Assistant():
     def __init__(self):
         app = QtWidgets.QApplication(sys.argv)
         self.MainWindow = QtWidgets.QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.MainWindow)
         self.threadpool = QThreadPool()
-        self.setWidgets()
-        self.initialAssistant()
+        self.set_widgets()
+        self.initial_assistant()
         self.MainWindow.show()
         sys.exit(app.exec_())
 
     #* ================================ SET & GET FUNCTIONS ==================================== #
 
     # Đặt title cho dialog
-    def setWidgets(self):
+    def set_widgets(self):
         self.MainWindow.setWindowTitle('Virtual Assistant- PyQt5')
         self.MainWindow.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.MainWindow.setFixedSize(
             self.MainWindow.width(), self.MainWindow.height())
 
     # Đặt text cho PlainTextEdit
-    def setPlainTextEdit(self, text):
+    def set_plain_text_edit(self, text):
         self.ui.plainTextEdit.setPlainText(text)
 
     # Đặt text cho Label
-    def setLabel(self, text):
+    def set_label(self, text):
         self.ui.label.setText(text)
 
     # Đặt text cho PlainTextEdit và Speak text đã đặt
     def response(self, text):
-        self.setPlainTextEdit(text)
+        self.set_plain_text_edit(text)
         self.speak(text)
 
     # Cho trợ lý ảo đọc text truyền vào
@@ -149,37 +149,37 @@ class assistant():
                 self.speak(text)
                 break
 
-    # Chạy thread nhận dạng giọng nói. Result được truyền vào function và thực hiện function sau sec (giây) đã đặt
-    def getTextFromAudio(self, function, sec):
-        worker = thread(self.speechRecognition, sec)
+    # Chạy Thread nhận dạng giọng nói. Result được truyền vào function và thực hiện function sau sec (giây) đã đặt
+    def get_text_from_audio(self, function, sec):
+        worker = Thread(self.speech_recognition, sec)
         worker.signals.result.connect(function)
         self.threadpool.start(worker)
 
     # Speech to text
-    def speechRecognition(self):
-        self.setLabel("Đang lắng nghe...")
+    def speech_recognition(self):
+        self.set_label("Đang lắng nghe...")
         r = sr.Recognizer()
         with sr.Microphone() as source:
             audio = r.listen(source, phrase_time_limit=5)
             try:
                 text = r.recognize_google(audio, language="vi-VN")
-                self.setLabel(text.lower())
+                self.set_label(text.lower())
                 return text.lower()
             except:
-                self.setLabel("...")
+                self.set_label("...")
                 return "none"
 
    #* ================================ CALL ASSISTANT ==================================== #
 
     # Khởi tạo ban đầu
-    def initialAssistant(self):
-        self.ui.pushButton.pressed.connect(self.callAssistant)
+    def initial_assistant(self):
+        self.ui.pushButton.pressed.connect(self.call_assistant)
 
     # Gọi trợ lý ảo
-    def callAssistant(self):
+    def call_assistant(self):
         playsound("notification.wav", False)
-        self.setPlainTextEdit("Tôi có thể giúp gì cho bạn?")
-        self.getTextFromAudio(self.request, 0.3)
+        self.set_plain_text_edit("Tôi có thể giúp gì cho bạn?")
+        self.get_text_from_audio(self.request, 0.3)
 
     # Yêu cầu chức năng
     def request(self, text):
@@ -187,35 +187,35 @@ class assistant():
             self.response("Xin lỗi, tôi không nghe rõ bạn nói gì!")
             pass
         elif "trợ giúp" in text or "help" in text:
-            self.helpMe()
+            self.help_me()
         elif "chào" in text or "hello" in text:
             self.greeting()
         elif "hôm nay" in text or "bữa nay" in text or "hiện tại" in text or "bây giờ" in text:
-            self.getTime(text)
+            self.get_time(text)
         elif "mở nhạc" in text or "mở video" in text:
-            self.playSong()
+            self.play_song()
         elif "thời tiết" in text:
-            self.whatWeather()
+            self.what_weather(text)
         elif "tin tức" in text:
-            self.readNews()
+            self.read_news()
         elif "tra cứu" in text:
-            self.lookupWikipedia()
+            self.lookup_wikipedia()
         elif "mở" in text:
             if "." in text:
-                self.openWebsite(text)
+                self.open_website(text)
             else:
-                self.openApplication(text)
+                self.open_application(text)
         elif "từ điển" in text:
             self.dictionary()
         else:
-            self.searchDefault(text)
+            self.search_default(text)
 
     #* ================================= ASSISTANT FUNCTIONS =================================== #
 
     # 1. Trợ giúp
-    def helpMe(self):
+    def help_me(self):
         self.speak("Tôi có thể giúp bạn làm những việc sau đây.")
-        self.setPlainTextEdit("""Tôi có thể giúp bạn thực hiện những việc sau đây:
+        self.set_plain_text_edit("""Tôi có thể giúp bạn thực hiện những việc sau đây:
         1. Hiển thị ngày giờ
         2. Mở video nhạc trên Youtube
         3. Xem dự báo thời tiết
@@ -223,7 +223,7 @@ class assistant():
         5. Tra cứu định nghĩa với Wikipedia
         6. Mở ứng dụng, phần mềm
         7. Mở website
-        8. Tra cứu từ điển 
+        8. Tra cứu từ điển
         9. Tìm kiếm từ khóa với Google""")
 
     # 2. Chào hỏi
@@ -238,7 +238,7 @@ class assistant():
             self.response("Chào buổi tối. Chúc bạn buổi tối vui vẻ.")
 
     # 3. Xem ngày giờ
-    def getTime(self, text):
+    def get_time(self, text):
         now = datetime.datetime.now()
         if "giờ" in text:
             self.response("Hiện tại là {} giờ {} phút.".format(
@@ -250,88 +250,191 @@ class assistant():
             pass
 
     # 4. Mở video trên Youtube
-    def playSong(self):
+    def play_song(self):
         self.response("Bạn muốn nghe bài gì?")
-        self.getTextFromAudio(self.searchMusicThread, 1)
+        self.get_text_from_audio(self.search_music_thread, 1)
 
-    def searchMusicThread(self, text):
+    def search_music_thread(self, text):
         if "none" in text:
             self.response("Xin lỗi, tôi không nghe rõ bạn nói gì!")
         else:
-            worker = thread(self.searchMusic, text, 0)
-            worker.signals.finished.connect(self.playSongComplete)
+            worker = Thread(self.search_music, text, 0)
+            worker.signals.finished.connect(self.play_song_complete)
             self.threadpool.start(worker)
-            self.setPlainTextEdit("Đang mở. Vui lòng đợi...")
+            self.set_plain_text_edit("Đang mở. Vui lòng đợi...")
 
-    def searchMusic(self, text):
+    def search_music(self, text):
         result = search_youtube([text])
         # result = YoutubeSearch(text, max_results=3).to_dict()
         url = "https://www.youtube.com/watch?v=" + result[0]["id"]
         # url = "https://www.youtube.com/" + result[0]["url_suffix"]
         webbrowser.open(url)
 
-    def playSongComplete(self):
+    def play_song_complete(self):
         self.speak("Đã mở bài hát bạn yêu cầu.")
-        self.setPlainTextEdit("Đã mở bài hát bạn yêu cầu.")
+        self.set_plain_text_edit("Đã mở bài hát bạn yêu cầu.")
 
     # 5. Xem dự báo thời tiết
-    def whatWeather(self):
-        self.response("Bạn muốn xem thời tiết ở đâu?")
-        self.getTextFromAudio(self.searchWeatherThread, 2)
-
-    def searchWeatherThread(self, text):
-        if "none" in text:
-            self.response("Xin lỗi, tôi không nghe rõ bạn nói gì!")
+    def what_weather(self, text):
+        if "tỉnh" in text:
+            reg_ex = re.search("tỉnh", text)
+            if reg_ex:
+                start = reg_ex.end() + 1
+                end = len(text)
+                city = text[start:end]
+            else:
+                city = "none"
+        elif "thành phố" in text:
+            reg_ex = re.search("thành phố", text)
+            if reg_ex:
+                start = reg_ex.end() + 1
+                end = len(text)
+                city = text[start:end]
+            else:
+                city = "none"
         else:
-            worker = thread(self.searchWeather, text, 0)
-            # worker.signals.result.connect(self.whatWeatherComplete)
-            self.threadpool.start(worker)
-            self.setPlainTextEdit("Đang tìm kiếm. Vui lòng đợi...")
+            city = "default"
 
-    def searchWeather(self, city):
-        nameCity = city
+        self.search_weather_thread(city)
+
+    def search_weather_thread(self, text):
+        self.set_plain_text_edit("Đang tìm kiếm. Vui lòng đợi...")
+        if "none" in text:
+            self.response("Xin lỗi, không tìm thấy địa điểm đã nói.")
+        elif "default" in text:
+            worker = Thread(self.search_weather_default, 0)
+            worker.signals.result.connect(self.what_weather_complete)
+            self.threadpool.start(worker)
+        else:
+            worker = Thread(self.search_weather, text, 0)
+            worker.signals.result.connect(self.what_weather_complete)
+            self.threadpool.start(worker)
+
+    def search_weather_default(self):
+        get_IP = requests.get("https://api.myip.com").json()
+        url = "https://ipinfo.io/{}/city?token=0b031e6458a2a9".format(
+            get_IP["ip"])
+        name_city = requests.get(url).text
+
         geolocator = Nominatim(user_agent="Virtual Assistant")
-        location = geolocator.geocode(nameCity)
+        location = geolocator.geocode(name_city)
 
         api = "4e7ced343986de64b7f54296a111c208"
         lat = location.latitude
         lon = location.longitude
         part = "minutely,hourly,daily,alerts"
-        units = "m"
-        url = "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude={}&units={}&appid={}"
-        url_onecall = url.format(lat, lon, part, units, api)
-        response = requests.get(url_onecall).json()
+        units = "metric"
+        lang = "vi"
+        url = "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude={}&units={}&lang={}&appid={}"
+        url_one_call = url.format(lat, lon, part, units, lang, api)
+        response = requests.get(url_one_call).json()
 
-        r_lat = response["lat"]
-        r_lon = response["lon"]
-        r_currentTime = response["current"]["dt"]
-        r_temp = response["current"]["temp"]
-        r_feelLike = response["current"]["feels_like"]
-        r_humidity = response["current"]["humidity"]
+        # c_lat = response["lat"]
+        # c_lon = response["lon"]
+        # c_cur_time = response["current"]["dt"]
+        # c_sunrise = response["current"]["sunrise"]
+        # c_sunset = response["current"]["sunset"]
+        c_temp = response["current"]["temp"]
+        # c_feel_like = response["current"]["feels_like"]
+        c_presure = response["current"]["pressure"]
+        c_humidity = response["current"]["humidity"]
+        # c_dew_point = response["current"]["dew_point"]
+        c_clouds = response["current"]["clouds"]
+        # c_uvi = response["current"]["uvi"]
+        # c_visibility = response["current"]["visibility"]
+        c_wind_speed = response["current"]["wind_speed"]
+        # c_wind_gust = response["current"]["wind_gust"]
+        # c_wind_deg = response["current"]["wind_deg"]
+        c_weather_id = response["current"]["weather"][0]["id"]
+        c_weather_main = response["current"]["weather"][0]["main"]
+        c_weather_description = response["current"]["weather"][0]["description"]
+        c_weather_icon = response["current"]["weather"][0]["icon"]
 
-        print(r_currentTime, r_lat, r_lon)
+        string = """Dự báo thời tiết {}:
+    Nhiệt độ: {} độ C
+    Độ ẩm: {}%
+    Mây: {}%
+    Tốc độ gió: {}m/s
+    Tình trạng: {}.
+    """
 
-        # return result
+        result = {
+            "weather": string.format(name_city, c_temp, c_humidity, c_clouds, c_wind_speed,
+                                     c_weather_description),
+            "string": "Dự báo thời tiết cho {} hôm nay.".format(name_city)
+        }
+        return result
 
-    def whatWeatherComplete(self, result):
-        self.setPlainTextEdit(result["current"])
-        self.speak("Đây là kết quả tìm kiếm được")
+    def search_weather(self, city):
+        name_city = city
+        geolocator = Nominatim(user_agent="Virtual Assistant")
+        location = geolocator.geocode(name_city)
+
+        api = "4e7ced343986de64b7f54296a111c208"
+        lat = location.latitude
+        lon = location.longitude
+        part = "minutely,hourly,daily,alerts"
+        units = "metric"
+        lang = "vi"
+        url = "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude={}&units={}&lang={}&appid={}"
+        url_one_call = url.format(lat, lon, part, units, lang, api)
+        response = requests.get(url_one_call).json()
+
+        # c_lat = response["lat"]
+        # c_lon = response["lon"]
+        # c_cur_time = response["current"]["dt"]
+        # c_sunrise = response["current"]["sunrise"]
+        # c_sunset = response["current"]["sunset"]
+        c_temp = response["current"]["temp"]
+        # c_feel_like = response["current"]["feels_like"]
+        c_presure = response["current"]["pressure"]
+        c_humidity = response["current"]["humidity"]
+        # c_dew_point = response["current"]["dew_point"]
+        c_clouds = response["current"]["clouds"]
+        # c_uvi = response["current"]["uvi"]
+        # c_visibility = response["current"]["visibility"]
+        c_wind_speed = response["current"]["wind_speed"]
+        # c_wind_gust = response["current"]["wind_gust"]
+        # c_wind_deg = response["current"]["wind_deg"]
+        c_weather_id = response["current"]["weather"][0]["id"]
+        c_weather_main = response["current"]["weather"][0]["main"]
+        c_weather_description = response["current"]["weather"][0]["description"]
+        c_weather_icon = response["current"]["weather"][0]["icon"]
+
+        string = """Dự báo thời tiết {}:
+    Nhiệt độ: {} độ C
+    Độ ẩm: {}%
+    Mây: {}%
+    Tốc độ gió: {}m/s
+    Tình trạng: {}.
+    """
+
+        result = {
+            "weather": string.format(name_city, c_temp, c_humidity,
+                                     c_clouds, c_wind_speed, c_weather_description),
+            "string": "Dự báo thời tiết cho {} hôm nay.".format(name_city)
+        }
+        return result
+
+    def what_weather_complete(self, result):
+        self.set_plain_text_edit(result["weather"])
+        self.speak(result["string"])
 
     # 6. Đọc báo rss news
-    def readNews(self):
+    def read_news(self):
         self.response("Bạn muốn xem tin tức gì?")
-        self.getTextFromAudio(self.searchNewsThread, 1.7)
+        self.get_text_from_audio(self.search_news_thread, 1.7)
 
-    def searchNewsThread(self, text):
+    def search_news_thread(self, text):
         if "none" in text:
             self.response("Xin lỗi, tôi không nghe rõ bạn nói gì!")
         else:
-            worker = thread(self.searchNews, text, 0)
-            worker.signals.result.connect(self.readNewsComplete)
+            worker = Thread(self.search_news, text, 0)
+            worker.signals.result.connect(self.read_news_complete)
             self.threadpool.start(worker)
-            self.setPlainTextEdit("Đang tìm kiếm. Vui lòng đợi...")
+            self.set_plain_text_edit("Đang tìm kiếm. Vui lòng đợi...")
 
-    def searchNews(self, text):
+    def search_news(self, text):
         params = {
             "apiKey": "30d02d187f7140faacf9ccd27a1441ad",
             "q": text,
@@ -363,25 +466,25 @@ class assistant():
 
         return result
 
-    def readNewsComplete(self, result):
-        self.setPlainTextEdit(result["content"])
+    def read_news_complete(self, result):
+        self.set_plain_text_edit(result["content"])
         self.speak(result["string"])
 
     # 7. Tìm kiếm định nghĩa wikipedia
-    def lookupWikipedia(self):
+    def lookup_wikipedia(self):
         self.response("Bạn muốn tra cứu từ gì?")
-        self.getTextFromAudio(self.searchWikiThread, 1.5)
+        self.get_text_from_audio(self.search_wiki_thread, 1.5)
 
-    def searchWikiThread(self, text):
+    def search_wiki_thread(self, text):
         if "none" in text:
             self.response("Xin lỗi, tôi không nghe rõ bạn nói gì!")
         else:
-            worker = thread(self.searchWiki, text, 0)
-            worker.signals.result.connect(self.lookupWikipediaComplete)
+            worker = Thread(self.search_wiki, text, 0)
+            worker.signals.result.connect(self.lookup_wikipedia_complete)
             self.threadpool.start(worker)
-            self.setPlainTextEdit("Đang tìm kiếm. Vui lòng đợi...")
+            self.set_plain_text_edit("Đang tìm kiếm. Vui lòng đợi...")
 
-    def searchWiki(self, text):
+    def search_wiki(self, text):
         wikipedia.set_lang('vi')
         content = "[Wikipedia vi-VN]\n" + wikipedia.summary(text)
         result = {
@@ -391,33 +494,33 @@ class assistant():
 
         return result
 
-    def lookupWikipediaComplete(self, result):
-        self.setPlainTextEdit(result["content"])
+    def lookup_wikipedia_complete(self, result):
+        self.set_plain_text_edit(result["content"])
         self.speak(result["string"])
 
     # 8. Mở phần mềm ứng dụng
-    def openApplication(self, text):
+    def open_application(self, text):
         if "edge" in text:
-            self.searchAppThread("msedge.exe", "Microsoft Edge")
+            self.search_app_thread("msedge.exe", "Microsoft Edge")
         elif "chrome" in text:
-            self.searchAppThread("chrome.exe", "Google Chrome")
+            self.search_app_thread("chrome.exe", "Google Chrome")
         elif "word" in text:
-            self.searchAppThread("WINWORD.EXE", "Microsoft Word")
+            self.search_app_thread("WINWORD.EXE", "Microsoft Word")
         elif "excel" in text:
-            self.searchAppThread("EXCEL.EXE", "Microsoft Excel")
+            self.search_app_thread("EXCEL.EXE", "Microsoft Excel")
         elif "powerpoint" in text:
-            self.searchAppThread("POWERPNT.EXE", "Microsoft PowerPoint")
+            self.search_app_thread("POWERPNT.EXE", "Microsoft PowerPoint")
         else:
             self.response("Không tìm thấy ứng dụng bạn yêu cầu.")
 
-    def searchAppThread(self, fileName, fullName):
-        worker = thread(self.searchApp, fileName, fullName, 0)
-        worker.signals.result.connect(self.openApplicationComplete)
+    def search_app_thread(self, fileName, fullName):
+        worker = Thread(self.search_app, fileName, fullName, 0)
+        worker.signals.result.connect(self.open_application_complete)
         self.threadpool.start(worker)
-        self.setPlainTextEdit("Đang mở ứng dụng. Vui lòng đợi...")
+        self.set_plain_text_edit("Đang mở ứng dụng. Vui lòng đợi...")
 
-    def searchApp(self, fileName, fullName):
-        path = findApp(fileName, drive)
+    def search_app(self, fileName, fullName):
+        path = find_app(fileName, drive)
         if path:
             os.startfile(path)
         else:
@@ -425,23 +528,23 @@ class assistant():
 
         return fullName
 
-    def openApplicationComplete(self, fullName):
+    def open_application_complete(self, fullName):
         if "none" in fullName:
             self.response("Ứng dụng bạn yêu cầu chưa được cài đặt.")
         else:
             self.response("Đã mở ứng dụng {}.".format(fullName))
 
     # 9. Mở website
-    def openWebsite(self, text):
-        self.searchWebThread(text)
+    def open_website(self, text):
+        self.search_web_thread(text)
 
-    def searchWebThread(self, text):
-        worker = thread(self.searchWeb, text, 0)
-        worker.signals.finished.connect(self.openWebsiteComplete)
+    def search_web_thread(self, text):
+        worker = Thread(self.search_web, text, 0)
+        worker.signals.finished.connect(self.open_website_complete)
         self.threadpool.start(worker)
-        self.setPlainTextEdit("Đang mở Website. Vui lòng đợi...")
+        self.set_plain_text_edit("Đang mở Website. Vui lòng đợi...")
 
-    def searchWeb(self, text):
+    def search_web(self, text):
         reg_ex = re.search("mở (.+)", text)
         if reg_ex:
             domain = reg_ex.group(1)
@@ -451,18 +554,18 @@ class assistant():
         else:
             return False
 
-    def openWebsiteComplete(self):
+    def open_website_complete(self):
         self.response("Đã mở trang web bạn yêu cầu.")
 
     # 10. Tìm kiếm bằng google engine của trình duyệt mặc định
-    def searchDefault(self, text):
-        self.searchThread(text)
+    def search_default(self, text):
+        self.search_thread(text)
 
-    def searchThread(self, text):
-        worker = thread(self.search, text, 0)
-        worker.signals.result.connect(self.searchDefaultComplete)
+    def search_thread(self, text):
+        worker = Thread(self.search, text, 0)
+        worker.signals.result.connect(self.search_default_complete)
         self.threadpool.start(worker)
-        self.setPlainTextEdit("Đang tìm kiếm. Vui lòng đợi...")
+        self.set_plain_text_edit("Đang tìm kiếm. Vui lòng đợi...")
 
     def search(self, text):
         service = build("customsearch", "v1",
@@ -470,9 +573,8 @@ class assistant():
         response = service.cse().list(q=text, cx="efcdf7a6d77b621bc", num="3", fields="context/title, items/displayLink, \
             items/formattedUrl, items/link, items/snippet, items/title, searchInformation/formattedSearchTime, \
                 searchInformation/formattedTotalResults").execute()
-        content = "[{title}]\nKhoảng {totalResults} kết quả ({searchTime} giây)\n\n".format(
-            title=response["context"]["title"], totalResults=response["searchInformation"]["formattedTotalResults"],
-            searchTime=response["searchInformation"]["formattedSearchTime"])
+        content = "[{}]\nKhoảng {} kết quả ({} giây)\n\n".format(response["context"]["title"], response["searchInformation"]["formattedTotalResults"],
+                                                                 response["searchInformation"]["formattedSearchTime"])
 
         for i in range(3):
             content = content + "[{num}] {displayLink}\n[Title] {title}\n[Snippet] {snippet}\n[FormattedUrl] {formattedUrl}\n\n".format(num=i+1,
@@ -487,18 +589,18 @@ class assistant():
 
         return result
 
-    def searchDefaultComplete(self, result):
-        self.setPlainTextEdit(result["content"])
+    def search_default_complete(self, result):
+        self.set_plain_text_edit(result["content"])
         self.speak(result["string"])
 
     # 11. Dịch nghĩa sang tiếng Việt
     def dictionary(self):
-        self.translateThread()
+        self.translate_thread()
 
-    def translateThread(self):
-        worker = threadD(self.translate)
-        worker.signals.result.connect(self.setPlainTextEdit)
-        self.setPlainTextEdit("Đã bật từ điển.")
+    def translate_thread(self):
+        worker = ThreadD(self.translate)
+        worker.signals.result.connect(self.set_plain_text_edit)
+        self.set_plain_text_edit("Đã bật từ điển.")
         self.threadpool.start(worker)
 
     # TODO Ghi nhớ clipboard do user copy vào 1 biến tạm, sau khi kết thúc thì đưa lại vào clipboard
@@ -529,24 +631,19 @@ class assistant():
             keyboard.release("c")
             time.sleep(0.05)
 
-            strFromClipBoard = pyperclip.paste()
+            str_from_clipboard = pyperclip.paste()
 
-            if strFromClipBoard != "":
-                content = translator.translate(strFromClipBoard, dest="vi")
+            if str_from_clipboard != "":
+                content = translator.translate(str_from_clipboard, dest="vi")
                 result = "[Nguồn] {0}\n[Đích] {1}\n[Kết quả]\n{2}".format(
                     content.src, content.dest, content.text)
             pyperclip.copy("")
 
         return result
 
-    def translateComplete(self, result):
-        if result == "":
-            pass
-        else:
-            self.setPlainTextEdit(result)
 
 #* ================================ FUNCITON MAIN ==================================== #
 
 
 if __name__ == "__main__":
-    assistant()
+    Assistant()

@@ -10,7 +10,10 @@ getIP = requests.get("https://api.myip.com").json()
 # pprint(result)
 
 # .format(getIP["ip"])
-url = "https://ipinfo.io/{}/city?token=0b031e6458a2a9".format(getIP["ip"])
+url = "https://ipinfo.io/{}/region?token=0b031e6458a2a9".format(getIP["ip"])
 result = requests.get(url)
+
+name = result.text
 # print(getIP["ip"])
-print(result.text)
+print(name.rstrip("\n"))
+print("a")

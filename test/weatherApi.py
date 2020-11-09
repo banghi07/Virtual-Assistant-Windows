@@ -2,6 +2,20 @@ import requests
 from pprint import pprint
 from geopy.geocoders import Nominatim
 
+""" 
+# ? Foreca -> Microsotf dùng
+# * Document: https://developer.foreca.com/ 
+# * Free: thời hạn 1 năm
+params = {
+    # "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9wZmEuZm9yZWNhLmNvbVwvYXV0aG9yaXplXC90b2tlbiIsImlhdCI6MTYwNDU5NDkwNywiZXhwIjoxNjA0NTk4NTA3LCJuYmYiOjE2MDQ1OTQ5MDcsImp0aSI6IjljZGM1MmZhODNkZDExMTUiLCJzdWIiOiJpcXdlZW56MDEiLCJmbXQiOiJYRGNPaGpDNDArQUxqbFlUdGpiT2lBPT0ifQ.jcw5zyp5BHWy-fRtoTtLuvIHWFRuy0b_uoLj_mWvSgg",
+    # "query": "cantho"
+}
+url = "https://pfa.foreca.com/api/v1/current/:location"
+response = requests.get(url=url, params=params)
+print(response.json())
+ """
+
+""" 
 # ? Open Weather Map
 # ! Tốc độ rất nhanh, icon đẹp
 # * Free: Current weather, forecast 7days/daily, Gov alerts, weather map, historical 5days
@@ -23,7 +37,7 @@ print(location.address)
 result = requests.get(url_onecall).json()["current"]["weather"]
 pprint(result)
 
-
+ """
 """ 
 # ? WeatherBit.io
 # ! tốc độ khá chậm, icon đẹp

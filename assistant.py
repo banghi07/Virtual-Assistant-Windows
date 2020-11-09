@@ -33,7 +33,6 @@ from youtube_search import YoutubeSearch
 
 from mainwindow import Ui_MainWindow
 from assistant_threads import *
-import assistant_functions as fn
 
 drive = "C:/"
 chain = []
@@ -294,7 +293,8 @@ class Assistant():
         if "none" in text:
             self.response("Xin lỗi, không tìm thấy địa điểm đã nói.")
         elif "default" in text:
-            worker = Thread(self.search_weather_default, "what_weather")
+            worker = Thread(self.search_weather_default,
+                            "what_weather_default")
             worker.signals.running.connect(self.update_worker_threads)
             worker.signals.result.connect(self.what_weather_complete)
             self.threadpool.start(worker)
@@ -305,17 +305,22 @@ class Assistant():
             self.threadpool.start(worker)
 
     def search_weather_default(self):
-        get_IP = requests.get("https://api.myip.com").json()
-        url = "https://ipinfo.io/{}/region?token=0b031e6458a2a9".format(
-            get_IP["ip"])
-        region = requests.get(url).text.rstrip("\n")
+        get_IP = requests.get("https://api.myip.com").json()["ip"]
+        url = "https://ipinfo.io/{}?token=0b031e6458a2a9".format(get_IP)
+        city = requests.get(url).json()["city"]
 
         geolocator = Nominatim(user_agent="Virtual Assistant")
-        location = geolocator.geocode(region)
+        location = geolocator.geocode(city)
 
-        api = "4e7ced343986de64b7f54296a111c208"
+        # url = "https://ipinfo.io/"
+        # response = requests.get(url).json()
+        # region = response["region"]
+        # location = response["loc"].text.split(",")
+
+        display_name = location.address
         lat = location.latitude
         lon = location.longitude
+        api = "4e7ced343986de64b7f54296a111c208"
         part = "minutely,hourly,daily,alerts"
         units = "metric"
         lang = "vi"
@@ -349,13 +354,13 @@ class Assistant():
     Độ ẩm: {}%
     Mây: {}%
     Tốc độ gió: {}m/s
-    Tình trạng: {}.
+    Mô tả: {}.
     """
 
         result = {
-            "weather": string.format(region, c_temp, c_humidity, c_clouds, c_wind_speed,
+            "weather": string.format(display_name, c_temp, c_humidity, c_clouds, c_wind_speed,
                                      c_weather_description),
-            "string": "Dự báo thời tiết cho {} hôm nay.".format(region)
+            "string": "Dự báo thời tiết {}.".format(display_name)
         }
         return result
 
@@ -363,9 +368,10 @@ class Assistant():
         geolocator = Nominatim(user_agent="Virtual Assistant")
         location = geolocator.geocode(region)
 
-        api = "4e7ced343986de64b7f54296a111c208"
+        display_name = location.address
         lat = location.latitude
         lon = location.longitude
+        api = "4e7ced343986de64b7f54296a111c208"
         part = "minutely,hourly,daily,alerts"
         units = "metric"
         lang = "vi"
@@ -399,13 +405,13 @@ class Assistant():
     Độ ẩm: {}%
     Mây: {}%
     Tốc độ gió: {}m/s
-    Tình trạng: {}.
+    Mô tả: {}.
     """
 
         result = {
-            "weather": string.format(region.title(), c_temp, c_humidity,
+            "weather": string.format(display_name, c_temp, c_humidity,
                                      c_clouds, c_wind_speed, c_weather_description),
-            "string": "Dự báo thời tiết cho {} hôm nay.".format(region)
+            "string": "Dự báo thời tiết {}.".format(display_name)
         }
         return result
 

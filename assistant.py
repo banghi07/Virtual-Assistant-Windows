@@ -12,6 +12,7 @@ import urllib.request as urllib2
 import webbrowser
 from time import strftime
 
+import feedparser
 import pyperclip
 import requests
 import speech_recognition as sr
@@ -31,8 +32,8 @@ from PyQt5.QtCore import *
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 from youtube_search import YoutubeSearch
 
-from mainwindow import Ui_MainWindow
 from assistant_threads import *
+from mainwindow import Ui_MainWindow
 
 drive = "C:/"
 chain = []
@@ -420,57 +421,134 @@ class Assistant():
         self.speak(result["string"])
 
     # 6. Đọc báo rss news
+    # def read_news(self):
+    #     self.response("Bạn muốn xem tin tức gì?")
+    #     self.get_text_from_audio(self.search_news_thread)
+
+    # def search_news_thread(self, text):
+    #     if "none" in text:
+    #         self.response("Xin lỗi, tôi không nghe rõ bạn nói gì!")
+    #     else:
+    #         worker = Thread(self.search_news, text, "read_news")
+    #         worker.signals.result.connect(self.read_news_complete)
+    #         worker.signals.running.connect(self.update_worker_threads)
+    #         self.threadpool.start(worker)
+    #         self.set_plain_text_edit("Đang tìm kiếm. Vui lòng đợi...")
+
+    # def search_news(self, text):
+    #     params = {
+    #         "apiKey": "30d02d187f7140faacf9ccd27a1441ad",
+    #         "q": text,
+    #     }
+    #     api_result = requests.get(
+    #         "http://newsapi.org/v2/top-headlines?", params)
+    #     api_response = api_result.json()
+    #     content = ""
+
+    #     for number, articles in enumerate(api_response["articles"], start=1):
+    #         if number > 5:
+    #             break
+    #         else:
+    #             string = "[No.{}]\n[Title] {}\n[Description] {}\n[Link] {}\n\n"
+    #             news = string.format(
+    #                 number, articles["title"], articles["description"], articles["url"])
+    #             content = content + news
+
+    #     if content == "":
+    #         result = {
+    #             "content": "Không tìm thấy tin tức về {}.".format(text),
+    #             "string": "Không tìm thấy tin tức về {}.".format(text)
+    #         }
+    #     else:
+    #         result = {
+    #             "content": content,
+    #             "string": "Đây là các tin tức về {}".format(text)
+    #         }
+
+    #     return result
+
+    # def read_news_complete(self, result):
+    #     self.set_plain_text_edit(result["content"])
+    #     self.speak(result["string"])
+
     def read_news(self):
-        self.response("Bạn muốn xem tin tức gì?")
-        self.get_text_from_audio(self.search_news_thread)
+        self.search_news_thread()
 
-    def search_news_thread(self, text):
-        if "none" in text:
-            self.response("Xin lỗi, tôi không nghe rõ bạn nói gì!")
-        else:
-            worker = Thread(self.search_news, text, "read_news")
-            worker.signals.result.connect(self.read_news_complete)
-            worker.signals.running.connect(self.update_worker_threads)
-            self.threadpool.start(worker)
-            self.set_plain_text_edit("Đang tìm kiếm. Vui lòng đợi...")
+    def search_news_thread(self):
+        worker = Thread(self.search_news, "read_news")
+        worker.signals.running.connect(self.update_worker_threads)
+        worker.signals.result.connect(self.read_news_complete)
+        self.threadpool.start(worker)
+        self.set_plain_text_edit("Đang tìm kiếm. Vui lòng đợi...")
 
-    def search_news(self, text):
-        params = {
-            "apiKey": "30d02d187f7140faacf9ccd27a1441ad",
-            "q": text,
-        }
-        api_result = requests.get(
-            "http://newsapi.org/v2/top-headlines?", params)
-        api_response = api_result.json()
-        content = ""
+    def search_news(self):
+        url = "https://vnexpress.net/rss/tin-moi-nhat.rss"
 
-        for number, articles in enumerate(api_response["articles"], start=1):
-            if number > 5:
+        def split_content(text):
+            i_desc = text.rfind(">")
+            i_start_img = text.rfind("src=")
+            i_end_img = text.rfind("/>")
+
+            description = text[i_desc + 1:]
+            link_image = text[i_start_img + 5: i_end_img - 2]
+
+            image_cover = link_image.replace("amp;", "")
+
+            content = {
+                "desc": description,
+                "l_img": image_cover
+            }
+
+            return content
+
+        def week_day(i):
+            if i == 0:
+                return "Thứ hai"
+            elif i == 1:
+                return "Thức ba"
+            elif i == 2:
+                return "Thứ tư"
+            elif i == 3:
+                return "Thứ năm"
+            elif i == 4:
+                return "Thứ sáu"
+            elif i == 5:
+                return "Thứ bảy"
+            elif i == 6:
+                return "Chủ nhật"
+
+        def time_format(s_time):
+            wday = week_day(s_time.tm_wday)
+            t = time.strftime("%d-%m-%Y, %H:%M:%S")
+            temp = wday + " " + t
+            return temp
+
+        feed = feedparser.parse(url)
+        feed_entries = feed.entries
+
+        i = 0
+        text = "VNExpress RSS:\n\n"
+
+        for entry in feed_entries:
+            if i == 5:
                 break
-            else:
-                string = "[No.{}]\n[Title] {}\n[Description] {}\n[Link] {}\n\n"
-                news = string.format(
-                    number, articles["title"], articles["description"], articles["url"])
-                content = content + news
+            i = i + 1
+            article_title = entry.title
+            article_link = entry.link
+            article_published_at = entry.published
+            article_published_at_parsed = entry.published_parsed  # Time object
+            article_published_at = time_format(article_published_at_parsed)
+            content = split_content(entry.summary)
+            temp = "[Title] {}\n[Published at] {}\n[Image cover] {}\n[Description] {}\n[Link] {}\n\n\n"
+            text = text + temp.format(article_title, article_published_at,
+                                      content["l_img"], content["desc"], article_link)
 
-        if content == "":
-            result = {
-                "content": "Không tìm thấy tin tức về {}.".format(text),
-                "string": "Không tìm thấy tin tức về {}.".format(text)
-            }
-        else:
-            result = {
-                "content": content,
-                "string": "Đây là các tin tức về {}".format(text)
-            }
+        return text
 
-        return result
+    def read_news_complete(self, text):
+        self.set_plain_text_edit(text)
 
-    def read_news_complete(self, result):
-        self.set_plain_text_edit(result["content"])
-        self.speak(result["string"])
-
-    # 7. Tìm kiếm định nghĩa wikipedia
+        # 7. Tìm kiếm định nghĩa wikipedia
     def lookup_wikipedia(self, text):
         reg_ex = re.search("tra cứu", text)
         if reg_ex:

@@ -27,14 +27,13 @@ from gtts import gTTS, gTTSError
 from playsound import playsound
 from pynput import keyboard, mouse
 from pynput.keyboard import Controller, Key
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 from youtube_search import YoutubeSearch
 
 from assistant_threads import *
+from assistant_sys_tray_icon import *
 from mainwindow import Ui_MainWindow
-from PyQt5.Qt import *
 
 drive = "C:/"
 chain = []
@@ -48,38 +47,23 @@ def find_app(name, path):
 
 class Assistant():
     def __init__(self):
-        app = QtWidgets.QApplication(sys.argv)
+        app = QApplication(sys.argv)
         app.setQuitOnLastWindowClosed(False)
 
-        icon = QIcon(
-            "./icon/fugue-icons-3.5.6/icons/application-plus-black.png")
-        tray = QSystemTrayIcon()
-        tray.setVisible(True)
-        tray.setIcon(icon)
+        w = QWidget()
+        tray_icon = SystemTrayIcon(w)
+        tray_icon.activated.connect(self.activate)
 
-        menu = QMenu()
-        action1 = QAction("About")
-        # action1.triggered.connect()
-        menu.addAction(action1)
-
-        action2 = QAction("Settings")
-        # action2.triggered.connect()
-        menu.addAction(action2)
-
-        aquit = QAction("Exit")
-        aquit.triggered.connect(app.quit)
-        menu.addAction(aquit)
-
-        tray.setContextMenu(menu)
-        tray.activated.connect(self.activate)
-
-        self.MainWindow = QtWidgets.QMainWindow()
+        self.MainWindow = QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.MainWindow)
+
         self.threadpool = QThreadPool()
         self.worker_threads = []
+
         self.set_widgets()
         self.initial_assistant()
+
         self.MainWindow.show()
         sys.exit(app.exec_())
 
@@ -95,9 +79,6 @@ class Assistant():
     def activate(self, reason):
         if reason == QSystemTrayIcon.Trigger:
             self.MainWindow.show()
-
-    def exit_window(self):
-        self.MainWindow.close()
 
     # Đặt text cho PlainTextEdit
     def set_plain_text_edit(self, text):
@@ -126,26 +107,16 @@ class Assistant():
         self.threadpool.start(worker)
 
     def speak_thread(self, text):
-        # while True:
-        #     try:
-        #         tts = gTTS(text=text, lang="vi", slow=False)
-        #         tts.save("sound.mp3")
-        #         playsound("sound.mp3", False)
-        #         os.remove("sound.mp3")
-        #         break
-        #     except:
-        #         self.speak(text)
-        #         break
         try:
             tts = gTTS(text=text, lang="vi", slow=False)
             tts.save("./audio/sound.mp3")
             playsound("./audio/sound.mp3", False)
             os.remove("./audio/sound.mp3")
-        except gTTSError:
-            print("Error: Mat ket noi internet.")
+        # except gTTSError:
+        #     print("Error: Mat ket noi internet.")
         except:
             print("Error: Token Google Translate. Try again...")
-            os.remove("./audio/sound.mp3")
+            # os.remove("./audio/sound.mp3")
             self.speak_thread(text)
 
     # Chạy Thread nhận dạng giọng nói. Result được truyền vào function và thực hiện function sau sec (giây) đã đặt

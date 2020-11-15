@@ -102,24 +102,47 @@ class Assistant():
 
     # Cho trợ lý ảo đọc text truyền vào
     def speak(self, text):
-        worker = Thread(self.speak_thread, text, "speak")
-        worker.signals.running.connect(self.update_worker_threads)
-        self.threadpool.start(worker)
+        if text.isnumeric():
+            worker = Thread(self.play_sound_thread, text, "speak")
+            worker.signals.running.connect(self.update_worker_threads)
+            self.threadpool.start(worker)
+        else:
+            worker = Thread(self.speak_thread, text, "speak")
+            worker.signals.running.connect(self.update_worker_threads)
+            self.threadpool.start(worker)
 
     def speak_thread(self, text):
         try:
             tts = gTTS(text=text, lang="vi", slow=False)
             tts.save("./audio/sound.mp3")
             playsound("./audio/sound.mp3", False)
-            os.remove("./audio/sound.mp3")
-        # except gTTSError:
-        #     print("Error: Mat ket noi internet.")
+            # os.remove("./audio/sound.mp3")
         except:
             print("Error: Token Google Translate. Try again...")
             # os.remove("./audio/sound.mp3")
             self.speak_thread(text)
 
-    # Chạy Thread nhận dạng giọng nói. Result được truyền vào function và thực hiện function sau sec (giây) đã đặt
+    def play_sound_thread(self, code):
+        if "001" in code:
+            playsound("./audio/001_none.mp3")
+        elif "002" in code:
+            playsound("./audio/002_help_me.mp3")
+        elif "003" in code:
+            playsound("./audio/003_good_mor.mp3")
+        elif "004" in code:
+            playsound("./audio/004_good_aft.mp3")
+        elif "005" in code:
+            playsound("./audio/005_good_night.mp3")
+        elif "006" in code:
+            playsound("./audio/006_play_song.mp3")
+        elif "007" in code:
+            playsound("./audio/007_wikipedia.mp3")
+        elif "008" in code:
+            playsound("./audio/008_open_app.mp3")
+        elif "009" in code:
+            playsound("./audio/009_open_web.mp3")
+
+    # Chạy Thread nhận dạng giọng nói (chuyển từ speech sang text)
     def get_text_from_audio(self, function):
         worker = Thread(self.speech_recognition, "get_text_from_audio")
         worker.signals.running.connect(self.update_worker_threads)
@@ -148,15 +171,15 @@ class Assistant():
 
     # Gọi trợ lý ảo
     def call_assistant(self):
-        playsound("./audio/notification.wav", False)
+        playsound("./audio/101_notification.wav", False)
         self.set_plain_text_edit("Tôi có thể giúp gì cho bạn?")
         self.get_text_from_audio(self.request)
 
     # Yêu cầu chức năng
     def request(self, text):
         if "none" in text:
-            self.response("Xin lỗi, tôi không nghe rõ bạn nói gì!")
-            pass
+            self.set_plain_text_edit("Xin lỗi, tôi không nghe rõ bạn nói gì!")
+            self.speak("001")
         elif "trợ giúp" in text or "help" in text:
             self.help_me()
         elif "chào" in text or "hello" in text:
@@ -199,18 +222,21 @@ class Assistant():
         string = "Tôi có thể giúp bạn làm những việc sau đây."
 
         self.set_plain_text_edit(text)
-        self.speak(string)
+        self.speak("002")
 
     # 2. Chào hỏi
     def greeting(self):
         day_time = int(strftime("%H"))
         if day_time < 12:
-            self.response("Chào buổi sáng. Chúc bạn một ngày tốt lành!")
+            # self.response("Chào buổi sáng. Chúc bạn một ngày tốt lành!")
+            self.speak("003")
         elif 12 <= day_time < 18:
-            self.response(
-                "Chào buổi chiều. Bạn đã dự định gì cho chiều này chưa?")
+            # self.response(
+            #     "Chào buổi chiều. Bạn đã dự định gì cho chiều này chưa?")
+            self.speak("004")
         else:
-            self.response("Chào buổi tối. Chúc bạn buổi tối vui vẻ.")
+            # self.response("Chào buổi tối. Chúc bạn buổi tối vui vẻ.")
+            self.speak("005")
 
     # 3. Xem ngày giờ
     def get_time(self, text):
@@ -268,7 +294,7 @@ class Assistant():
         print(text)
 
     def play_song_complete(self):
-        self.speak("Đã mở bài hát bạn yêu cầu.")
+        self.speak("006")
         self.set_plain_text_edit("Đã mở bài hát bạn yêu cầu.")
 
     # 5. Xem dự báo thời tiết
@@ -424,56 +450,6 @@ class Assistant():
         self.speak(result["string"])
 
     # 6. Đọc báo rss news
-    # def read_news(self):
-    #     self.response("Bạn muốn xem tin tức gì?")
-    #     self.get_text_from_audio(self.search_news_thread)
-
-    # def search_news_thread(self, text):
-    #     if "none" in text:
-    #         self.response("Xin lỗi, tôi không nghe rõ bạn nói gì!")
-    #     else:
-    #         worker = Thread(self.search_news, text, "read_news")
-    #         worker.signals.result.connect(self.read_news_complete)
-    #         worker.signals.running.connect(self.update_worker_threads)
-    #         self.threadpool.start(worker)
-    #         self.set_plain_text_edit("Đang tìm kiếm. Vui lòng đợi...")
-
-    # def search_news(self, text):
-    #     params = {
-    #         "apiKey": "30d02d187f7140faacf9ccd27a1441ad",
-    #         "q": text,
-    #     }
-    #     api_result = requests.get(
-    #         "http://newsapi.org/v2/top-headlines?", params)
-    #     api_response = api_result.json()
-    #     content = ""
-
-    #     for number, articles in enumerate(api_response["articles"], start=1):
-    #         if number > 5:
-    #             break
-    #         else:
-    #             string = "[No.{}]\n[Title] {}\n[Description] {}\n[Link] {}\n\n"
-    #             news = string.format(
-    #                 number, articles["title"], articles["description"], articles["url"])
-    #             content = content + news
-
-    #     if content == "":
-    #         result = {
-    #             "content": "Không tìm thấy tin tức về {}.".format(text),
-    #             "string": "Không tìm thấy tin tức về {}.".format(text)
-    #         }
-    #     else:
-    #         result = {
-    #             "content": content,
-    #             "string": "Đây là các tin tức về {}".format(text)
-    #         }
-
-    #     return result
-
-    # def read_news_complete(self, result):
-    #     self.set_plain_text_edit(result["content"])
-    #     self.speak(result["string"])
-
     def read_news(self):
         self.search_news_thread()
 
@@ -551,7 +527,7 @@ class Assistant():
     def read_news_complete(self, text):
         self.set_plain_text_edit(text)
 
-        # 7. Tìm kiếm định nghĩa wikipedia
+    # 7. Tìm kiếm định nghĩa wikipedia
     def lookup_wikipedia(self, text):
         reg_ex = re.search("tra cứu", text)
         if reg_ex:
@@ -575,13 +551,14 @@ class Assistant():
         content = "[Wikipedia vi-VN]\n" + wikipedia.summary(text)
         result = {
             "content": content,
-            "string": "Đây là kết quả từ Wikipedia"
+            "string": "Đây là kết quả tìm kiếm từ Wikipedia"
         }
         return result
 
     def lookup_wikipedia_complete(self, result):
         self.set_plain_text_edit(result["content"])
-        self.speak(result["string"])
+        # self.speak(result["string"])
+        self.speak("007")
 
     # 8. Mở phần mềm ứng dụng
     def open_application(self, text):
@@ -618,7 +595,8 @@ class Assistant():
         if "none" in fullName:
             self.response("Ứng dụng bạn yêu cầu chưa được cài đặt.")
         else:
-            self.response("Đã mở ứng dụng {}.".format(fullName))
+            # self.response("Đã mở ứng dụng {}.".format(fullName))
+            self.speak("008")
 
     # 9. Mở website
     def open_website(self, text):
@@ -643,6 +621,7 @@ class Assistant():
 
     def open_website_complete(self):
         self.response("Đã mở trang web bạn yêu cầu.")
+        self.speak("009")
 
     # 10. Tìm kiếm bằng google engine của trình duyệt mặc định
     def search_default(self, text):

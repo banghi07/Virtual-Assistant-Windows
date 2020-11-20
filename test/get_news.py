@@ -37,15 +37,12 @@ def split_content(text):
     i_start_img = text.rfind("src=")
     i_end_img = text.rfind("/>")
 
-    description = text[i_desc + 1:]
-    link_image = text[i_start_img + 5: i_end_img - 2]
+    description = text[i_desc + 1 :]
+    link_image = text[i_start_img + 5 : i_end_img - 2]
 
     image_cover = link_image.replace("amp;", "")
 
-    content = {
-        "desc": description,
-        "l_img": image_cover
-    }
+    content = {"desc": description, "l_img": image_cover}
 
     return content
 
@@ -83,17 +80,29 @@ text = ""
 for entry in feed_entries:
     if i == 5:
         break
-    i = i + 1
+
     article_title = entry.title
     article_link = entry.link
     article_published_at = entry.published
     article_published_at_parsed = entry.published_parsed  # Time object
     article_published_at = time_format(article_published_at_parsed)
     content = split_content(entry.summary)
-    temp = "[Title] {}\n[Published at] {}\n[Image cover] {}\n[Description] {}\n[Link] {}\n\n"
-    text = text + temp.format(article_title, article_published_at,
-                              content["l_img"], content["desc"], article_link)
 
+    filename = "./image/cover" + str(i) + ".jpg"
+    img_url = content["l_img"]
+    img_data = requests.get(img_url).content
+    with open(filename, "wb") as handler:
+        handler.write(img_data)
+
+    temp = "[Title] {}\n[Published at] {}\n[Image cover] {}\n[Description] {}\n[Link] {}\n\n"
+    text = text + temp.format(
+        article_title,
+        article_published_at,
+        content["l_img"],
+        content["desc"],
+        article_link,
+    )
+    i += 1
 
 print(text)
 

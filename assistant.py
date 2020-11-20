@@ -31,9 +31,10 @@ from PyQt5.QtWidgets import *
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 from youtube_search import YoutubeSearch
 
-from assistant_threads import *
 from assistant_sys_tray_icon import *
-from mainwindow import Ui_MainWindow
+from assistant_threads import *
+from assistant_window import Ui_MainWindow
+from news import News
 
 drive = "C:/"
 chain = []
@@ -116,7 +117,7 @@ class Assistant():
             tts = gTTS(text=text, lang="vi", slow=False)
             tts.save("./audio/sound.mp3")
             playsound("./audio/sound.mp3", False)
-            # os.remove("./audio/sound.mp3")
+            os.remove("./audio/sound.mp3")
         except:
             print("Error: Token Google Translate. Try again...")
             # os.remove("./audio/sound.mp3")
@@ -335,21 +336,17 @@ class Assistant():
             self.threadpool.start(worker)
 
     def search_weather_default(self):
-        get_IP = requests.get("https://api.myip.com").json()["ip"]
-        url = "https://ipinfo.io/{}?token=0b031e6458a2a9".format(get_IP)
-        city = requests.get(url).json()["city"]
+        url = "https://ipinfo.io/"
+        response = requests.get(url).json()
+        city = response["city"]
+        region = response["region"]
+        location = response["loc"].split(",")
 
         geolocator = Nominatim(user_agent="Virtual Assistant")
-        location = geolocator.geocode(city)
+        display_name = geolocator.geocode(city).address
 
-        # url = "https://ipinfo.io/"
-        # response = requests.get(url).json()
-        # region = response["region"]
-        # location = response["loc"].text.split(",")
-
-        display_name = location.address
-        lat = location.latitude
-        lon = location.longitude
+        lat = location[0]
+        lon = location[1]
         api = "4e7ced343986de64b7f54296a111c208"
         part = "minutely,hourly,daily,alerts"
         units = "metric"
@@ -468,36 +465,37 @@ class Assistant():
             i_start_img = text.rfind("src=")
             i_end_img = text.rfind("/>")
 
-            description = text[i_desc + 1:]
-            link_image = text[i_start_img + 5: i_end_img - 2]
+            if i_start_img == -1:
+                image_cover = "none"
+                print("none\n")
+            else:
+                link_image = text[i_start_img + 5 : i_end_img - 2]
+                image_cover = link_image.replace("amp;", "")
 
-            image_cover = link_image.replace("amp;", "")
-
-            content = {
-                "desc": description,
-                "l_img": image_cover
-            }
+            description = text[i_desc + 1 :]
+            content = {"desc": description, "l_img": image_cover}
 
             return content
 
         def week_day(i):
             if i == 0:
-                return "Thứ hai"
-            elif i == 1:
-                return "Thức ba"
-            elif i == 2:
-                return "Thứ tư"
-            elif i == 3:
-                return "Thứ năm"
-            elif i == 4:
-                return "Thứ sáu"
-            elif i == 5:
-                return "Thứ bảy"
-            elif i == 6:
                 return "Chủ nhật"
+            elif i == 1:
+                return "Thức hai"
+            elif i == 2:
+                return "Thứ ba"
+            elif i == 3:
+                return "Thứ tư"
+            elif i == 4:
+                return "Thứ năm"
+            elif i == 5:
+                return "Thứ sáu"
+            elif i == 6:
+                return "Thứ bảy"
 
         def time_format(s_time):
-            wday = week_day(s_time.tm_wday)
+            # wday = week_day(s_time.tm_wday)
+            wday = str(s_time.tm_wday)
             t = time.strftime("%d-%m-%Y, %H:%M:%S")
             temp = wday + " " + t
             return temp
@@ -506,26 +504,54 @@ class Assistant():
         feed_entries = feed.entries
 
         i = 0
-        text = "VNExpress RSS:\n\n"
+        text = ""
+        result = {}
 
         for entry in feed_entries:
             if i == 5:
                 break
-            i = i + 1
+
             article_title = entry.title
             article_link = entry.link
             article_published_at = entry.published
             article_published_at_parsed = entry.published_parsed  # Time object
-            article_published_at = time_format(article_published_at_parsed)
+            # article_published_at = time_format(article_published_at_parsed)
             content = split_content(entry.summary)
-            temp = "[Title] {}\n[Published at] {}\n[Image cover] {}\n[Description] {}\n[Link] {}\n\n\n"
-            text = text + temp.format(article_title, article_published_at,
-                                      content["l_img"], content["desc"], article_link)
 
-        return text
+            filename = "./image/cover" + str(i) + ".jpg"
+            img_url = content["l_img"]
 
-    def read_news_complete(self, text):
-        self.set_plain_text_edit(text)
+            if "none" in img_url:
+                article = {
+                    "title": article_title,
+                    "published_at": article_published_at,
+                    "cover_img": "./image/no_img.jpg",
+                    "description": content["desc"],
+                    "link": article_link,
+                }
+
+            else:
+                img_data = requests.get(img_url).content
+                with open(filename, "wb") as handler:
+                    handler.write(img_data)
+
+                article = {
+                    "title": article_title,
+                    "published_at": article_published_at_parsed,
+                    "cover_img": filename,
+                    "description": content["desc"],
+                    "link": article_link,
+                }
+
+            key = "no_" + str(i)
+            result.update({key: article})
+            i += 1
+
+        return result        
+
+    def read_news_complete(self, result):
+        self.MainWindow.close()
+        self.NewsWindow = News(result)
 
     # 7. Tìm kiếm định nghĩa wikipedia
     def lookup_wikipedia(self, text):
@@ -637,9 +663,9 @@ class Assistant():
     def search_gg(self, text):
         service = build("customsearch", "v1",
                         developerKey="AIzaSyD79kNJykY2xrelsR8tE3QciUe83nOyYKw")
-        response = service.cse().list(q=text, cx="efcdf7a6d77b621bc", num="3", fields="context/title, items/displayLink, \
-            items/formattedUrl, items/link, items/snippet, items/title, searchInformation/formattedSearchTime, \
-                searchInformation/formattedTotalResults").execute()
+        response = service.cse().list(q=text, cx="efcdf7a6d77b621bc", num="3", fields="context/title,\
+                                        items/displayLink, items/formattedUrl, items/link, items/snippet, items/title,\
+                                        searchInformation/formattedSearchTime, searchInformation/formattedTotalResults").execute()
         content = "[{}]\nKhoảng {} kết quả ({} giây)\n\n".format(response["context"]["title"], response["searchInformation"]["formattedTotalResults"],
                                                                  response["searchInformation"]["formattedSearchTime"])
 

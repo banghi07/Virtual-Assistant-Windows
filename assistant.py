@@ -35,6 +35,7 @@ from assistant_sys_tray_icon import *
 from assistant_threads import *
 from assistant_window import Ui_MainWindow
 from news import News
+from weather import Weather
 
 drive = "C:/"
 chain = []
@@ -79,6 +80,8 @@ class Assistant():
 
     def activate(self, reason):
         if reason == QSystemTrayIcon.Trigger:
+            self.set_plain_text_edit("")
+            self.set_label("")
             self.MainWindow.show()
 
     # Đặt text cho PlainTextEdit
@@ -362,7 +365,7 @@ class Assistant():
         c_sunset = response["current"]["sunset"]
         c_temp = response["current"]["temp"]
         c_feel_like = response["current"]["feels_like"]
-        c_presure = response["current"]["pressure"]
+        c_pressure = response["current"]["pressure"]
         c_humidity = response["current"]["humidity"]
         c_dew_point = response["current"]["dew_point"]
         c_clouds = response["current"]["clouds"]
@@ -376,18 +379,19 @@ class Assistant():
         c_weather_description = response["current"]["weather"][0]["description"]
         c_weather_icon = response["current"]["weather"][0]["icon"]
 
-        string = """Dự báo thời tiết {}:
-    Nhiệt độ: {} độ C
-    Độ ẩm: {}%
-    Mây: {}%
-    Tốc độ gió: {}m/s
-    Mô tả: {}.
-    """
-
         result = {
-            "weather": string.format(display_name, c_temp, c_humidity, c_clouds, c_wind_speed,
-                                     c_weather_description),
-            "string": "Dự báo thời tiết {}.".format(display_name)
+            "city": display_name,
+            "icon": c_weather_icon,
+            "feel_like": c_feel_like,
+            "desc": c_weather_description,
+            "temp": c_temp,
+            "pressure": c_pressure,
+            "humidity": c_humidity,
+            "cloud": c_clouds,
+            "wind_deg": c_wind_deg,
+            "wind_speed": c_wind_speed,
+            "uvi": c_uvi,
+            "visibility": c_visibility,
         }
         return result
 
@@ -413,7 +417,7 @@ class Assistant():
         c_sunset = response["current"]["sunset"]
         c_temp = response["current"]["temp"]
         c_feel_like = response["current"]["feels_like"]
-        c_presure = response["current"]["pressure"]
+        c_pressure = response["current"]["pressure"]
         c_humidity = response["current"]["humidity"]
         c_dew_point = response["current"]["dew_point"]
         c_clouds = response["current"]["clouds"]
@@ -427,24 +431,25 @@ class Assistant():
         c_weather_description = response["current"]["weather"][0]["description"]
         c_weather_icon = response["current"]["weather"][0]["icon"]
 
-        string = """Dự báo thời tiết {}:
-    Nhiệt độ: {} độ C
-    Độ ẩm: {}%
-    Mây: {}%
-    Tốc độ gió: {}m/s
-    Mô tả: {}.
-    """
-
         result = {
-            "weather": string.format(display_name, c_temp, c_humidity,
-                                     c_clouds, c_wind_speed, c_weather_description),
-            "string": "Dự báo thời tiết {}.".format(display_name)
+            "city": display_name,
+            "icon": c_weather_icon,
+            "feel_like": c_feel_like,
+            "desc": c_weather_description,
+            "temp": c_temp,
+            "pressure": c_pressure,
+            "humidity": c_humidity,
+            "cloud": c_clouds,
+            "wind_deg": c_wind_deg,
+            "wind_speed": c_wind_speed,
+            "uvi": c_uvi,
+            "visibility": c_visibility,
         }
         return result
 
     def what_weather_complete(self, result):
-        self.set_plain_text_edit(result["weather"])
-        self.speak(result["string"])
+        self.MainWindow.close()
+        self.weather_window = Weather(result)
 
     # 6. Đọc báo rss news
     def read_news(self):

@@ -9,14 +9,14 @@ import urllib3
 
 
 class News:
-    def __init__(self):
-        app = QtWidgets.QApplication(sys.argv)
+    def __init__(self, result):
+        # app = QtWidgets.QApplication(sys.argv)
         self.Form = QtWidgets.QWidget()
         self.ui = Ui_Form()
         self.ui.setupUi(self.Form)
         self.set_news_form()
-        # self.result = result
-        self.result = self.get_news()
+        self.result = result
+        # self.result = self.get_news()
 
         widget_list = list()
 
@@ -55,10 +55,11 @@ class News:
             self.ui.verticalLayout.addWidget(w)
 
         self.Form.show()
-        sys.exit(app.exec_())
+        # sys.exit(app.exec_())
 
     def set_news_form(self):
         self.Form.setWindowTitle("Tin Tức")
+        self.ui.tabWidget.setTabText(0, "Tin mới nhất")
 
     def get_news(self):
         url = "https://vnexpress.net/rss/tin-moi-nhat.rss"

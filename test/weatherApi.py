@@ -15,7 +15,7 @@ response = requests.get(url=url, params=params)
 print(response.json())
  """
 
-""" 
+
 # ? Open Weather Map
 # ! Tốc độ rất nhanh, icon đẹp
 # * Free: Current weather, forecast 7days/daily, Gov alerts, weather map, historical 5days
@@ -37,7 +37,7 @@ print(location.address)
 result = requests.get(url_onecall).json()["current"]["weather"]
 pprint(result)
 
- """
+
 """ 
 # ? WeatherBit.io
 # ! tốc độ khá chậm, icon đẹp

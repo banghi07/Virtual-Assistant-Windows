@@ -65,6 +65,7 @@ class ThreadD(QRunnable):
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
+        self.is_kill = False
         self.thread_name = list(self.args)[-1]
         self.signals = ThreadDSignals()
 
@@ -79,3 +80,8 @@ class ThreadD(QRunnable):
             result = self.fn(*t, **self.kwargs)
             self.signals.result.emit(result)
             self.signals.running.emit(self.thread_name, 0)
+            if self.is_kill:
+                raise WorkerKillException
+
+    def kill(self):
+        self.is_kill = True

@@ -36,9 +36,9 @@ from assistant_threads import *
 from assistant_window import Ui_MainWindow
 from news import News
 from weather import Weather
+from trans import Trans
 
 drive = "C:/"
-chain = []
 
 
 def find_app(name, path):
@@ -158,7 +158,7 @@ class Assistant():
         self.set_label("Đang lắng nghe...")
         r = sr.Recognizer()
         with sr.Microphone() as source:
-            audio = r.listen(source, phrase_time_limit=5)
+            audio = r.listen(source, phrase_time_limit=3)
             try:
                 text = r.recognize_google(audio, language="vi-VN")
                 self.set_label(text.lower())
@@ -693,11 +693,13 @@ class Assistant():
 
     # 11. Dịch nghĩa sang tiếng Việt
     def dictionary(self):
+        self.MainWindow.close()
         self.translate_thread()
 
     def translate_thread(self):
         worker = ThreadD(self.translate, "dictionary")
-        worker.signals.result.connect(self.set_plain_text_edit)
+        worker.signals.result.connect(self.translate_complete)
+        # worker.signals.result.connect(self.set_plain_text_edit)
         worker.signals.running.connect(self.update_worker_threads)
         self.set_plain_text_edit("Đã bật từ điển.")
         self.threadpool.start(worker)
@@ -706,24 +708,26 @@ class Assistant():
     def translate(self):
         keyboard = Controller()
         translator = Translator()
-        result = ""
+        self.chain = []
+        result = {
+            "error": 2,
+        }
 
         def on_move(x, y):
-            global chain
-            chain.append(2)
+            self.chain.append(2)
 
         def on_click(x, y, button, pressed):
-            global chain
             if pressed:
-                chain.append(1)
+                self.chain.append(1)
             else:
-                chain.append(3)
+                self.chain.append(3)
+                self.cursor_position = QPoint(x, y)
                 return False
 
         with mouse.Listener(on_move=on_move, on_click=on_click) as mouseListener:
             mouseListener.join()
 
-        if chain[-2] != 1:
+        if self.chain[-2] != 1:
             keyboard.press(Key.ctrl)
             keyboard.press("c")
             keyboard.release(Key.ctrl)
@@ -738,13 +742,28 @@ class Assistant():
                     content = translator.translate(
                         str_from_clipboard, dest="vi")
                 except:
-                    result = "Lỗi. Hãy thử lại"
+                    result = {
+                        "error": 1,
+                        "text": "Lỗi! Hãy thử lại.",
+                        "cursor_pos": self.cursor_position 
+                    }
                 else:
-                    result = "[Nguồn] {0}\n[Đích] {1}\n[Kết quả]\n{2}".format(
-                        content.src, content.dest, content.text)
-
+                    result = {
+                        "error": 0,
+                        "src": content.src,
+                        "dest": content.dest,
+                        "text": content.text,
+                        "cursor_pos": self.cursor_position 
+                    }
+        
         return result
 
+    def translate_complete(self, result):
+        if result["error"] == 2:
+            pass
+        else:
+            self.trans_window = Trans(result)
+        
 
 #* ================================ FUNCITON MAIN ==================================== #
 

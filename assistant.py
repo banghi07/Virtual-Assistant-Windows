@@ -697,12 +697,11 @@ class Assistant():
         self.translate_thread()
 
     def translate_thread(self):
-        worker = ThreadD(self.translate, "dictionary")
-        worker.signals.result.connect(self.translate_complete)
-        # worker.signals.result.connect(self.set_plain_text_edit)
-        worker.signals.running.connect(self.update_worker_threads)
+        self.trans_worker = ThreadD(self.translate, "dictionary")
+        self.trans_worker.signals.result.connect(self.translate_complete)
+        self.trans_worker.signals.running.connect(self.update_worker_threads)
         self.set_plain_text_edit("Đã bật từ điển.")
-        self.threadpool.start(worker)
+        self.threadpool.start(self.trans_worker)
 
     # TODO Ghi nhớ clipboard do user copy vào 1 biến tạm, sau khi kết thúc thì đưa lại vào clipboard
     def translate(self):
@@ -710,7 +709,7 @@ class Assistant():
         translator = Translator()
         self.chain = []
         result = {
-            "error": 2,
+            "error": 1,
         }
 
         def on_move(x, y):
@@ -738,32 +737,22 @@ class Assistant():
             pyperclip.copy("")
 
             if str_from_clipboard != "":
-                try:
-                    content = translator.translate(
-                        str_from_clipboard, dest="vi")
-                except:
-                    result = {
-                        "error": 1,
-                        "text": "Lỗi! Hãy thử lại.",
-                        "cursor_pos": self.cursor_position 
-                    }
-                else:
-                    result = {
-                        "error": 0,
-                        "src": content.src,
-                        "dest": content.dest,
-                        "text": content.text,
-                        "cursor_pos": self.cursor_position 
-                    }
-        
+                result = {
+                    "error": 0,
+                    "text": str_from_clipboard,
+                    "cursor_pos": self.cursor_position
+                }
+
         return result
 
     def translate_complete(self, result):
-        if result["error"] == 2:
+        if result["error"]:
             pass
         else:
-            self.trans_window = Trans(result)
-        
+            self.trans_window = Trans(result, self)
+
+    def exit_dict(self):
+        self.trans_worker.kill()
 
 #* ================================ FUNCITON MAIN ==================================== #
 

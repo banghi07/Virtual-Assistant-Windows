@@ -52,8 +52,6 @@ class Thread(QRunnable):
         self.is_kill = True
 
 
-# ? Thead riêng tạm thời cho function dictionary (sử dụng vòng lặp while True)
-# TODO thêm tính năng khi thoát phần mềm thì kill Thread translate đi vì translate dùng while True
 class ThreadDSignals(QObject):
     running = pyqtSignal(str, int)
     result = pyqtSignal(object)
@@ -76,12 +74,12 @@ class ThreadD(QRunnable):
         l.pop()
         t = tuple(l)
         while True:
+            if self.is_kill:
+                break
             self.signals.running.emit(self.thread_name, 1)
             result = self.fn(*t, **self.kwargs)
             self.signals.result.emit(result)
             self.signals.running.emit(self.thread_name, 0)
-            if self.is_kill:
-                raise WorkerKillException
 
     def kill(self):
         self.is_kill = True

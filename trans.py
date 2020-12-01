@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets
 from trans_window import Ui_Form
 from PyQt5.QtCore import QEvent, QPoint, Qt
 from googletrans import Translator
+from google_trans_new import google_translator
 from assistant_threads import *
 
 
@@ -40,14 +41,23 @@ class Trans:
         self.thread_pool.start(worker)
         self.ui.plainTextEdit.setPlainText("Đang dịch, vui lòng đợi...")
 
+    # def translate(self):
+    #     translator = Translator()
+    #     try:
+    #         content = translator.translate(self.result["text"], dest="vi")
+    #     except:
+    #         return "Lỗi! Hãy thử lại."
+    #     else:
+    #         return content.text
+
     def translate(self):
-        translator = Translator()
+        translator = google_translator()
         try:
-            content = translator.translate(self.result["text"], dest="vi")
+            content = translator.translate(self.result["text"], lang_tgt="vi")
         except:
             return "Lỗi! Hãy thử lại."
         else:
-            return content.text
+            return content
 
     def translate_complete(self, result):
         self.ui.plainTextEdit.setPlainText(result)

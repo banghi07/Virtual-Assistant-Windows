@@ -18,12 +18,13 @@ class TestGUI(QMainWindow):
         self.show()
 
     def set_window(self):
+        self.setWindowFlag(Qt.FramelessWindowHint)
         widget = QWidget()
-        self.setFixedSize(500, 300)
+        self.setFixedSize(500, 400)
         self.setWindowTitle("Virtual Assistant - PyQt5")
 
         label = QLabel()
-        loading_gif_url = "./icon/animated/Spin-1s-200px.gif"
+        loading_gif_url = "./icon/Spin-1s-200px.gif"
         loading_gif = QMovie(loading_gif_url)
         loading_gif.start()
         label.setMovie(loading_gif)
@@ -47,7 +48,7 @@ class TestGUI(QMainWindow):
 
     def next_window(self):
         widget = QWidget()
-        self.setFixedSize(800, 500)
+        self.setFixedSize(500, 400)
         self.setWindowTitle("Virtual Assistant - PyQt5")
 
         button = QPushButton("OK")

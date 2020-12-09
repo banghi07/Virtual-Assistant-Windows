@@ -1,0 +1,54 @@
+QWidget#widget_main {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QWidget#widget_title_bar {
+  background-color: #ffffff;
+  border-top: 1px solid #595959;
+  border-left: 1px solid #595959;
+  border-right: 1px solid #595959;
+}
+
+QPushButton#button_close {
+  background-color: #ffffff;
+  border-style: none;
+  border-right: 1px solid #595959;
+}
+
+QPushButton#button_close:hover {
+  background-color: #e6e6e6;
+  border-style: none;
+  border-right: 1px solid #595959;
+}
+
+QPushButton#button_close:pressed {
+  background-color: #ff471a;
+  border-style: none;
+  border-right: 1px solid #595959;
+}
+
+QLabel#label_assistant_ask {
+  font: 16px;
+  background-color: #e6e6e6;
+  border-color: #e6e6e6;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+QLabel#label_assistant_hint {
+  font: 13px;
+}
+
+QWidget#widget_user_answer {
+  background-color: #e6e6e6;
+  border-bottom: 1px solid #595959;
+  border-left: 1px solid #595959;
+  border-right: 1px solid #595959;
+}
+
+QLabel#label_user_listening {
+  font: 16px;
+  color: #064d69;
+  padding: 10px;
+}

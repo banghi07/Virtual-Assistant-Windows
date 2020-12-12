@@ -64,7 +64,6 @@ class UI_Windows(object):
         self.button_microphone = QPushButton()
         self.button_microphone.setObjectName("button_microphone")
         self.button_microphone.setFixedSize(40, 40)
-        # self.button_microphone.setIcon(QIcon("./icon/microphone-black-shape-32px.png"))
         self.button_microphone.setIcon(QIcon("./icon/microphone-32px.png"))
 
     def title_bar(self):
@@ -85,6 +84,7 @@ class UI_Windows(object):
 
         self.layout_bottom_bar = QHBoxLayout(self.widget_bottom_bar)
         self.layout_bottom_bar.setContentsMargins(0, 0, 0, 0)
+        self.layout_bottom_bar.setSpacing(0)
 
     def update_bottom_bar(self, *args):
         self.clear_layout(self.layout_bottom_bar)
@@ -103,8 +103,8 @@ class UI_Windows(object):
                 self.icon_user_message.setIcon(QIcon("./icon/message-32px.png"))
 
                 self.layout_bottom_bar.addWidget(self.icon_user_message)
-                self.layout_bottom_bar.addStretch()
                 self.layout_bottom_bar.addWidget(self.label_user_answer)
+                self.layout_bottom_bar.addStretch()
 
         else:
             self.label_assistant_listening = QLabel("Đang lắng nghe...")
@@ -116,8 +116,8 @@ class UI_Windows(object):
             self.icon_sound_waves.setIcon(QIcon("./icon/audio-waves-32px.png"))
 
             self.layout_bottom_bar.addWidget(self.icon_sound_waves)
-            self.layout_bottom_bar.addStretch()
             self.layout_bottom_bar.addWidget(self.label_assistant_listening)
+            self.layout_bottom_bar.addStretch()
 
     # * UI main window
     def setupUI_main_window(self, MainWindow):

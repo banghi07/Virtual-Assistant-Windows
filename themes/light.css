@@ -65,13 +65,13 @@ QPushButton#icon_sound_waves {
 QLabel#label_assistant_listening {
   font: 16px;
   color: #064d69;
-  padding-right: 10px;
+  margin-bottom: 2px;
 }
 
 QLabel#label_user_answer {
   font: 16px;
   color: #e23046;
-  margin-right: 10px;
+  margin-bottom: 2px;
 }
 
 /* Widget Simple Window */

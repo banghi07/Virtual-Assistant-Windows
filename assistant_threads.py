@@ -17,7 +17,7 @@ class ThreadSignals(QObject):
 
 class Thread(QRunnable):
     def __init__(self, fn, *args, **kwargs):
-        super(Thread, self).__init__()
+        super().__init__()
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
@@ -28,7 +28,6 @@ class Thread(QRunnable):
     @pyqtSlot()
     def run(self):
         l = list(self.args)
-        # time.sleep(l[-1])
         l.pop()
         t = tuple(l)
         try:
@@ -44,7 +43,6 @@ class Thread(QRunnable):
             self.signals.error.emit()
         else:
             self.signals.result.emit(result)
-        finally:
             self.signals.running.emit(self.thread_name, 0)
             self.signals.finished.emit()
 
@@ -59,7 +57,7 @@ class ThreadDSignals(QObject):
 
 class ThreadD(QRunnable):
     def __init__(self, fn, *args, **kwargs):
-        super(ThreadD, self).__init__()
+        super().__init__()
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
@@ -70,7 +68,6 @@ class ThreadD(QRunnable):
     @pyqtSlot()
     def run(self):
         l = list(self.args)
-        # # time.sleep(l[-1])
         l.pop()
         t = tuple(l)
         while True:
@@ -83,3 +80,19 @@ class ThreadD(QRunnable):
 
     def kill(self):
         self.is_kill = True
+
+
+class ThreadDelaySignals(QObject):
+    finished = pyqtSignal()
+
+
+class ThreadDelay(QRunnable):
+    def __init__(self, time_delay):
+        super().__init__()
+        self.time_delay = time_delay
+        self.signals = ThreadDelaySignals()
+
+    @pyqtSlot()
+    def run(self):
+        time.sleep(self.time_delay)
+        self.signals.finished.emit()

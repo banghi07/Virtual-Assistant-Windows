@@ -1,4 +1,9 @@
-QWidget#widget_main {
+/* QWidget {
+  border: 1px solid black;
+} */
+
+/* Widget Main Window */
+QWidget#widget_main_window {
   background-color: #ffffff;
   border: 1px solid #595959;
 }
@@ -11,20 +16,22 @@ QWidget#widget_title_bar {
 }
 
 QPushButton#button_close {
-  background-color: #ffffff;
   border-style: none;
+  border-top: 1px solid #595959;
   border-right: 1px solid #595959;
 }
 
 QPushButton#button_close:hover {
   background-color: #e6e6e6;
   border-style: none;
+  border-top: 1px solid #595959;
   border-right: 1px solid #595959;
 }
 
 QPushButton#button_close:pressed {
   background-color: #ff471a;
   border-style: none;
+  border-top: 1px solid #595959;
   border-right: 1px solid #595959;
 }
 
@@ -37,18 +44,70 @@ QLabel#label_assistant_ask {
 }
 
 QLabel#label_assistant_hint {
-  font: 13px;
+  font: 14px;
 }
 
-QWidget#widget_user_answer {
+QWidget#widget_bottom_bar {
   background-color: #e6e6e6;
   border-bottom: 1px solid #595959;
   border-left: 1px solid #595959;
   border-right: 1px solid #595959;
 }
 
-QLabel#label_user_listening {
+QPushButton#icon_user_message {
+  border-style: none;
+}
+
+QPushButton#icon_sound_waves {
+  border-style: none;
+}
+
+QLabel#label_assistant_listening {
   font: 16px;
   color: #064d69;
+  padding-right: 10px;
+}
+
+QLabel#label_user_answer {
+  font: 16px;
+  color: #e23046;
+  margin-right: 10px;
+}
+
+/* Widget Simple Window */
+QWidget#widget_simple_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_icon_assistant_answer {
   padding: 10px;
+}
+
+QLabel#label_assistant_answer {
+  font: 16px;
+  background-color: #e6e6e6;
+  border-color: #e6e6e6;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+QPushButton#button_microphone {
+  border-style: none;
+  border-right: 1px solid #595959;
+  border-bottom: 1px solid #595959;
+}
+
+QPushButton#button_microphone:hover {
+  background-color: #8b989e;
+  border-style: none;
+  border-right: 1px solid #595959;
+  border-bottom: 1px solid #595959;
+}
+
+QPushButton#button_microphone:pressed {
+  background-color: #b8b8b8;
+  border-style: none;
+  border-right: 1px solid #595959;
+  border-bottom: 1px solid #595959;
 }

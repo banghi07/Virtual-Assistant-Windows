@@ -119,6 +119,12 @@ class UI_Windows(object):
             self.layout_bottom_bar.addWidget(self.label_assistant_listening)
             self.layout_bottom_bar.addStretch()
 
+    def add_widget_space(self, height, layout):
+        self.widget_space = QWidget()
+        self.widget_space.setFixedHeight(height)
+
+        layout.addWidget(self.widget_space)
+
     # * UI main window
     def setupUI_main_window(self, MainWindow):
         self.clear_UI(MainWindow)
@@ -256,12 +262,137 @@ class UI_Windows(object):
 
         self.layout_simple_window.addWidget(self.widget_assistant_answer)
 
+    def setupUI_clock_window(self, MainWindow, result):
+        self.clear_UI(MainWindow)
+        self.widget_clock_window = QWidget()
+        self.widget_clock_window.setObjectName("widget_clock_window")
+        self.widget_clock_window.setFixedSize(500, 450)
+
+        self.layout_clock_window = QVBoxLayout(self.widget_clock_window)
+        self.layout_clock_window.setContentsMargins(0, 0, 0, 0)
+
+        self.layout_clock_window.addWidget(self.widget_title_bar)
+        self.add_widget_space(50, self.layout_clock_window)
+
+        s = result["zone_name"] + ", " + "UTC " + result["utc"]
+        self.display_time_zone(s)
+        self.add_widget_space(30, self.layout_clock_window)
+
+        self.display_clock(result["hour"], result["minute"], result["second"])
+        self.add_widget_space(15, self.layout_clock_window)
+
+        self.display_date_clock_window(result["day"], result["month"], result["year"])
+        self.layout_clock_window.addStretch()
+
+        self.layout_clock_window.addWidget(self.widget_bottom_bar)
+        self.update_bottom_bar(0)
+
+        MainWindow.layout_container.addWidget(self.widget_clock_window)
+        MainWindow.set_shadow_window()
+        MainWindow.show()
+        MainWindow.set_center_screen()
+
+    # def display_city_name(self, text):
+    #     self.widget_city_name = QWidget()
+    #     self.widget_city_name.setObjectName("widget_city_name")
+
+    #     self.layout_city_name = QHBoxLayout(self.widget_city_name)
+    #     self.layout_city_name.setContentsMargins(0, 0, 0, 0)
+
+    #     self.icon_location_city_name = QLabel()
+    #     self.icon_location_city_name.setObjectName("icon_location_city_name")
+    #     self.icon_location_city_name.setFixedSize(35, 25)
+    #     self.icon_location_city_name.setScaledContents(True)
+    #     self.icon_location_city_name.setPixmap(QPixmap("./icon/placeholder-32px.png"))
+
+    #     self.label_city_name = QLabel(text)
+    #     self.label_city_name.setObjectName("label_city_name")
+
+    #     self.layout_city_name.addWidget(self.icon_location_city_name)
+    #     self.layout_city_name.addWidget(self.label_city_name)
+    #     self.layout_city_name.addStretch()
+
+    def display_time_zone(self, text):
+        self.widget_time_zone = QWidget()
+        self.widget_time_zone.setObjectName("widget_time_zone")
+
+        self.layout_time_zone = QHBoxLayout(self.widget_time_zone)
+        self.layout_time_zone.setContentsMargins(0, 0, 0, 0)
+
+        self.icon_time_zone = QLabel()
+        self.icon_time_zone.setObjectName("icon_time_zone")
+        self.icon_time_zone.setPixmap(QPixmap("./icon/time-zone-32px.png"))
+        self.icon_time_zone.setScaledContents(True)
+        self.icon_time_zone.setFixedSize(32, 32)
+
+        self.label_time_zone = QLabel(text)
+        self.label_time_zone.setObjectName("label_time_zone")
+
+        self.layout_time_zone.addStretch()
+        self.layout_time_zone.addWidget(self.icon_time_zone)
+        self.layout_time_zone.addWidget(self.label_time_zone)
+        self.layout_time_zone.addStretch()
+
+        self.layout_clock_window.addWidget(self.widget_time_zone)
+
+    def display_clock(self, h, m, s):
+        self.widget_clock = QWidget()
+        self.widget_clock.setObjectName("widget_clock")
+
+        self.layout_clock = QHBoxLayout(self.widget_clock)
+        self.layout_clock.setContentsMargins(0, 0, 0, 0)
+
+        self.label_hour = QLabel(h)
+        self.label_hour.setObjectName("label_hour")
+
+        self.label_colon = QLabel(":")
+        self.label_colon.setObjectName("label_colon")
+
+        self.label_minute = QLabel(m)
+        self.label_minute.setObjectName("label_minute")
+
+        self.label_colon2 = QLabel(":")
+        self.label_colon2.setObjectName("label_colon2")
+
+        self.label_second = QLabel(s)
+        self.label_second.setObjectName("label_second")
+
+        self.layout_clock.addStretch()
+        self.layout_clock.addWidget(self.label_hour)
+        self.layout_clock.addWidget(self.label_colon)
+        self.layout_clock.addWidget(self.label_minute)
+        self.layout_clock.addWidget(self.label_colon2)
+        self.layout_clock.addWidget(self.label_second)
+        self.layout_clock.addStretch()
+
+        self.layout_clock_window.addWidget(self.widget_clock)
+
+    def display_date_clock_window(self, d, m, y):
+        self.widget_date_clock_window = QWidget()
+        self.widget_date_clock_window.setObjectName("widget_date_clock_window")
+
+        self.layout_date_clock_window = QHBoxLayout(self.widget_date_clock_window)
+        self.layout_date_clock_window.setContentsMargins(0, 0, 0, 0)
+
+        date = d + "/" + m + "/" + y
+
+        self.label_date_clock_window = QLabel(date)
+        self.label_date_clock_window.setObjectName("label_date_clock_window")
+
+        self.layout_date_clock_window.addStretch()
+        self.layout_date_clock_window.addWidget(self.label_date_clock_window)
+        self.layout_date_clock_window.addStretch()
+
+        self.layout_clock_window.addWidget(self.widget_date_clock_window)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     MainWindow = Window()
     ui = UI_Windows()
+    ui.btn_close()
+    ui.btn_microphone()
     ui.title_bar()
     ui.bottom_bar()
-    ui.setupUI_simple_window(MainWindow, "./icon/inability-to-speak.png", "hahahaaaaaa")
+    ui.setupUI_clock_window(MainWindow)
     sys.exit(app.exec_())

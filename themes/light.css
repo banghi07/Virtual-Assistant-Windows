@@ -2,12 +2,7 @@
   border: 1px solid black;
 } */
 
-/* Widget Main Window */
-QWidget#widget_main_window {
-  background-color: #ffffff;
-  border: 1px solid #595959;
-}
-
+/* Initial */
 QWidget#widget_title_bar {
   background-color: #ffffff;
   border-top: 1px solid #595959;
@@ -35,23 +30,48 @@ QPushButton#button_close:pressed {
   border-right: 1px solid #595959;
 }
 
+QWidget#widget_bottom_bar {
+  background-color: #e6e6e6;
+  border-bottom: 1px solid #595959;
+  border-left: 1px solid #595959;
+  border-right: 1px solid #595959;
+}
+
+QPushButton#button_microphone {
+  border-style: none;
+  border-right: 1px solid #595959;
+  border-bottom: 1px solid #595959;
+}
+
+QPushButton#button_microphone:hover {
+  background-color: #8b989e;
+  border-style: none;
+  border-right: 1px solid #595959;
+  border-bottom: 1px solid #595959;
+}
+
+QPushButton#button_microphone:pressed {
+  background-color: #b8b8b8;
+  border-style: none;
+  border-right: 1px solid #595959;
+  border-bottom: 1px solid #595959;
+}
+
+/* Widget Main Window */
+QWidget#widget_main_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
 QLabel#label_assistant_ask {
   font: 16px;
   background-color: #e6e6e6;
-  border-color: #e6e6e6;
   border-radius: 5px;
   padding: 10px;
 }
 
 QLabel#label_assistant_hint {
   font: 14px;
-}
-
-QWidget#widget_bottom_bar {
-  background-color: #e6e6e6;
-  border-bottom: 1px solid #595959;
-  border-left: 1px solid #595959;
-  border-right: 1px solid #595959;
 }
 
 QPushButton#icon_user_message {
@@ -87,27 +107,53 @@ QLabel#label_icon_assistant_answer {
 QLabel#label_assistant_answer {
   font: 16px;
   background-color: #e6e6e6;
-  border-color: #e6e6e6;
   border-radius: 5px;
   padding: 10px;
 }
 
-QPushButton#button_microphone {
-  border-style: none;
-  border-right: 1px solid #595959;
-  border-bottom: 1px solid #595959;
+/* Widget clock window */
+QWidget#widget_clock_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
 }
 
-QPushButton#button_microphone:hover {
-  background-color: #8b989e;
-  border-style: none;
-  border-right: 1px solid #595959;
-  border-bottom: 1px solid #595959;
+QLabel#icon_location_city_name {
+  padding-left: 10px;
 }
 
-QPushButton#button_microphone:pressed {
-  background-color: #b8b8b8;
-  border-style: none;
-  border-right: 1px solid #595959;
-  border-bottom: 1px solid #595959;
+QLabel#label_time_zone {
+  font: 16px;
+}
+
+QLabel#label_colon {
+  font: 40px;
+}
+
+QLabel#label_colon2 {
+  font: 40px;
+}
+
+QLabel#label_hour {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_minute {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_second {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_date_clock_window {
+  font: 20px;
 }

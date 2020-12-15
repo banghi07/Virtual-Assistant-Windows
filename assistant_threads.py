@@ -83,16 +83,19 @@ class ThreadD(QRunnable):
 
 
 class ThreadDelaySignals(QObject):
+    args = pyqtSignal(object)
     finished = pyqtSignal()
 
 
 class ThreadDelay(QRunnable):
-    def __init__(self, time_delay):
+    def __init__(self, time_delay, *args):
         super().__init__()
         self.time_delay = time_delay
+        self.args = args
         self.signals = ThreadDelaySignals()
 
     @pyqtSlot()
     def run(self):
         time.sleep(self.time_delay)
         self.signals.finished.emit()
+        self.signals.args.emit(self.args)

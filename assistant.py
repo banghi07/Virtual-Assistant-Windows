@@ -149,8 +149,8 @@ class Assistant:
         elif "hôm nay" in text or "hiện tại" in text or "bây giờ" in text:
             if "giờ" in text:
                 delay.signals.finished.connect(self.get_time_thread)
-            # elif "ngày" in text:
-            #     delay.signals.finished.connect(self.get_date)
+            elif "ngày" in text or "thứ" in text:
+                delay.signals.finished.connect(self.get_date_thread)
 
         self.threadpool.start(delay)
 
@@ -211,6 +211,57 @@ class Assistant:
         )
 
         self.ui.setupUI_clock_window(self.MainWindow, result)
+        self.speak_thread(speech)
+
+    def get_date_thread(self):
+        self.thread = Thread(self.get_time, "get_date")
+        self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.result.connect(self.get_date_complete)
+        self.threadpool.start(self.thread)
+
+    def get_date(self):
+        location = self.get_location_from_ip()
+
+        api = "BL83E6LF3XI3"
+        url = "http://api.timezonedb.com/v2.1/get-time-zone?key={}&format=json&by=position&lat={}&lng={}"
+        response = requests.get(
+            url.format(api, location["lat"], location["lon"])
+        ).json()
+
+        u = int(response["gmtOffset"]) / 3600
+        if u >= 0:
+            utc = "+" + "{:.0f}".format(u)
+        else:
+            utc = str("{:.0f}".format(u))
+
+        t = response["formatted"]
+        year = t[0:4]
+        month = t[5:7]
+        day = t[8:10]
+        hour = t[11:13]
+        minute = t[14:16]
+        second = t[17:19]
+
+        result = {
+            "city": location["city"],
+            "zone_name": response["zoneName"],
+            "utc": utc,
+            "year": year,
+            "month": month,
+            "day": day,
+            "hour": hour,
+            "minute": minute,
+            "second": second,
+        }
+
+        return result
+
+    def get_date_complete(self, result):
+        speech = "Hôm nay là ngày {} tháng {} năm {}".format(
+            result["day"], result["month"], result["year"]
+        )
+
+        self.ui.setupUI_date_window(self.MainWindow, result)
         self.speak_thread(speech)
 
 

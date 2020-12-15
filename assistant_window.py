@@ -276,12 +276,15 @@ class UI_Windows(object):
 
         s = result["zone_name"] + ", " + "UTC " + result["utc"]
         self.display_time_zone(s)
+        self.layout_clock_window.addWidget(self.widget_time_zone)
         self.add_widget_space(30, self.layout_clock_window)
 
         self.display_clock(result["hour"], result["minute"], result["second"])
         self.add_widget_space(15, self.layout_clock_window)
 
-        self.display_date_clock_window(result["day"], result["month"], result["year"])
+        self.display_date_in_clock_window(
+            result["day"], result["month"], result["year"]
+        )
         self.layout_clock_window.addStretch()
 
         self.layout_clock_window.addWidget(self.widget_bottom_bar)
@@ -333,8 +336,6 @@ class UI_Windows(object):
         self.layout_time_zone.addWidget(self.label_time_zone)
         self.layout_time_zone.addStretch()
 
-        self.layout_clock_window.addWidget(self.widget_time_zone)
-
     def display_clock(self, h, m, s):
         self.widget_clock = QWidget()
         self.widget_clock.setObjectName("widget_clock")
@@ -367,23 +368,119 @@ class UI_Windows(object):
 
         self.layout_clock_window.addWidget(self.widget_clock)
 
-    def display_date_clock_window(self, d, m, y):
-        self.widget_date_clock_window = QWidget()
-        self.widget_date_clock_window.setObjectName("widget_date_clock_window")
+    def display_date_in_clock_window(self, d, m, y):
+        self.widget_date_in_clock_window = QWidget()
+        self.widget_date_in_clock_window.setObjectName("widget_date_in_clock_window")
 
-        self.layout_date_clock_window = QHBoxLayout(self.widget_date_clock_window)
-        self.layout_date_clock_window.setContentsMargins(0, 0, 0, 0)
+        self.layout_date_in_clock_window = QHBoxLayout(self.widget_date_in_clock_window)
+        self.layout_date_in_clock_window.setContentsMargins(0, 0, 0, 0)
+
+        self.icon_date = QLabel()
+        self.icon_date.setObjectName("icon_date")
+        self.icon_date.setPixmap(QPixmap("./icon/calendar-32px.png"))
+        self.icon_date.setScaledContents(True)
+        self.icon_date.setFixedSize(25, 25)
 
         date = d + "/" + m + "/" + y
 
-        self.label_date_clock_window = QLabel(date)
-        self.label_date_clock_window.setObjectName("label_date_clock_window")
+        self.label_date_in_clock_window = QLabel(date)
+        self.label_date_in_clock_window.setObjectName("label_date_in_clock_window")
 
-        self.layout_date_clock_window.addStretch()
-        self.layout_date_clock_window.addWidget(self.label_date_clock_window)
-        self.layout_date_clock_window.addStretch()
+        self.layout_date_in_clock_window.addStretch()
+        self.layout_date_in_clock_window.addWidget(self.icon_date)
+        self.layout_date_in_clock_window.addWidget(self.label_date_in_clock_window)
+        self.layout_date_in_clock_window.addStretch()
 
-        self.layout_clock_window.addWidget(self.widget_date_clock_window)
+        self.layout_clock_window.addWidget(self.widget_date_in_clock_window)
+
+    def setupUI_date_window(self, MainWindow, result):
+        self.clear_UI(MainWindow)
+        self.widget_date_window = QWidget()
+        self.widget_date_window.setObjectName("widget_date_window")
+
+        self.layout_date_window = QVBoxLayout(self.widget_date_window)
+        self.layout_date_window.setContentsMargins(0, 0, 0, 0)
+
+        self.layout_date_window.addWidget(self.widget_title_bar)
+        self.add_widget_space(50, self.layout_date_window)
+
+        s = result["zone_name"] + ", " + "UTC " + result["utc"]
+        self.display_time_zone(s)
+        self.layout_date_window.addWidget(self.widget_time_zone)
+        self.add_widget_space(30, self.layout_date_window)
+
+        self.display_date(result["day"], result["month"], result["year"])
+        self.add_widget_space(15, self.layout_date_window)
+
+        self.display_clock_in_date_window(
+            result["hour"], result["minute"], result["second"]
+        )
+        self.layout_date_window.addStretch()
+
+        self.layout_date_window.addWidget(self.widget_bottom_bar)
+        self.update_bottom_bar(0)
+
+        MainWindow.layout_container.addWidget(self.widget_date_window)
+        MainWindow.set_shadow_window()
+        MainWindow.show()
+        MainWindow.set_center_screen()
+
+    def display_date(self, d, m, y):
+        self.widget_date = QWidget()
+        self.widget_date.setObjectName("widget_date")
+
+        self.layout_date = QHBoxLayout(self.widget_date)
+        self.layout_date.setContentsMargins(0, 0, 0, 0)
+
+        self.label_day = QLabel(d)
+        self.label_day.setObjectName("label_day")
+
+        self.label_slash = QLabel("/")
+        self.label_slash.setObjectName("label_slash")
+
+        self.label_month = QLabel(m)
+        self.label_month.setObjectName("label_month")
+
+        self.label_slash2 = QLabel("/")
+        self.label_slash2.setObjectName("label_slash2")
+
+        self.label_year = QLabel(y)
+        self.label_year.setObjectName("label_year")
+
+        self.layout_date.addStretch()
+        self.layout_date.addWidget(self.label_day)
+        self.layout_date.addWidget(self.label_slash)
+        self.layout_date.addWidget(self.label_month)
+        self.layout_date.addWidget(self.label_slash2)
+        self.layout_date.addWidget(self.label_year)
+        self.layout_date.addStretch()
+
+        self.layout_date_window.addWidget(self.widget_date)
+
+    def display_clock_in_date_window(self, h, m, s):
+        self.widget_clock_in_date_window = QWidget()
+        self.widget_clock_in_date_window.setObjectName("widget_clock_in_date_window")
+
+        self.layout_clock_in_date_window = QHBoxLayout(self.widget_clock_in_date_window)
+        self.layout_clock_in_date_window.setContentsMargins(0, 0, 0, 0)
+
+        self.icon_clock = QLabel()
+        self.icon_clock.setObjectName("icon_clock")
+        self.icon_clock.setPixmap(QPixmap("./icon/clock-32px.png"))
+        self.icon_clock.setScaledContents(True)
+        self.icon_clock.setFixedSize(25, 25)
+
+        clock = h + ":" + m + ":" + s
+
+        self.label_clock_in_date_window = QLabel(clock)
+        self.label_clock_in_date_window.setObjectName("label_clock_in_date_window")
+
+        self.layout_clock_in_date_window.addStretch()
+        self.layout_clock_in_date_window.addWidget(self.icon_clock)
+        self.layout_clock_in_date_window.addWidget(self.label_clock_in_date_window)
+        self.layout_clock_in_date_window.addStretch()
+
+        self.layout_date_window.addWidget(self.widget_clock_in_date_window)
 
 
 if __name__ == "__main__":

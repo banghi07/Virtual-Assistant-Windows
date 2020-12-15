@@ -117,10 +117,6 @@ QWidget#widget_clock_window {
   border: 1px solid #595959;
 }
 
-QLabel#icon_location_city_name {
-  padding-left: 10px;
-}
-
 QLabel#label_time_zone {
   font: 16px;
 }
@@ -154,6 +150,49 @@ QLabel#label_second {
   background-color: #e6e6e6;
 }
 
-QLabel#label_date_clock_window {
+QLabel#label_date_in_clock_window {
+  font: 20px;
+}
+
+/* Widget date window */
+QWidget#widget_date_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_time_zone {
+  font: 16px;
+}
+
+QLabel#label_slash {
+  font: 40px;
+}
+
+QLabel#label_slash2 {
+  font: 40px;
+}
+
+QLabel#label_day {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_month {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_year {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_clock_in_date_window {
   font: 20px;
 }

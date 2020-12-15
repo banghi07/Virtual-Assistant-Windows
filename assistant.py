@@ -151,6 +151,8 @@ class Assistant:
                 delay.signals.finished.connect(self.get_time_thread)
             elif "ngày" in text or "thứ" in text:
                 delay.signals.finished.connect(self.get_date_thread)
+        elif "mở video" in text or "mở bài" in text:
+            delay.signals.args.connect(self.play_song_thread)
 
         self.threadpool.start(delay)
 
@@ -213,6 +215,7 @@ class Assistant:
         self.ui.setupUI_clock_window(self.MainWindow, result)
         self.speak_thread(speech)
 
+    # * func_no3:
     def get_date_thread(self):
         self.thread = Thread(self.get_time, "get_date")
         self.thread.signals.running.connect(self.update_thread_list)
@@ -263,6 +266,42 @@ class Assistant:
 
         self.ui.setupUI_date_window(self.MainWindow, result)
         self.speak_thread(speech)
+
+    # * func_no4:
+    def play_song_thread(self, args):
+        self.ui.update_bottom_bar()
+        self.ui.setupUI_loading_window(self.MainWindow, "Đang mở video....")
+
+        text = list(args)[0]
+        if "mở video" in text:
+            reg_ex = re.search("mở video", text)
+            start = reg_ex.end() + 1
+            end = len(text)
+            song_name = text[start:end]
+            if song_name == "":
+                song_name = "none"
+        elif "mở bài" in text:
+            reg_ex = re.search("mở bài", text)
+            start = reg_ex.end() + 1
+            end = len(text)
+            song_name = text[start:end]
+            if song_name == "":
+                song_name = "none"
+
+        self.thread = Thread(self.play_song, song_name, "play_song")
+        self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.result.connect(self.play_song_complete)
+        self.threadpool.start(self.thread)
+
+    def play_song(self, text):
+        result = search_youtube([text])
+        # result = YoutubeSearch(text, max_results=3).to_dict()
+        url = "https://www.youtube.com/watch?v=" + result[0]["id"]
+        # url = "https://www.youtube.com/" + result[0]["url_suffix"]
+        webbrowser.open(url)
+
+    def play_song_complete(self):
+        self.MainWindow.close()
 
 
 if __name__ == "__main__":

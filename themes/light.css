@@ -196,3 +196,16 @@ QLabel#label_year {
 QLabel#label_clock_in_date_window {
   font: 20px;
 }
+
+/* Widget loading window */
+QWidget#widget_loading_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_assistant_loading {
+  font: 16px;
+  background-color: #e6e6e6;
+  border-radius: 5px;
+  padding: 10px;
+}

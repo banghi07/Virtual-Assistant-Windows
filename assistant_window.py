@@ -7,9 +7,9 @@ from PyQt5.QtWidgets import *
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setStyleSheet(open("./themes/light.css").read())
 
         self.widget_container = QWidget()
@@ -90,8 +90,24 @@ class UI_Windows(object):
         self.clear_layout(self.layout_bottom_bar)
         if len(args) > 0:
             if "0" in str(list(args)[0]):
+                self.label_assistant_listening = QLabel("Đang lắng nghe...")
+                self.label_assistant_listening.setObjectName(
+                    "label_assistant_listening"
+                )
+
+                self.icon_sound_waves = QPushButton()
+                self.icon_sound_waves.setObjectName("icon_sound_waves")
+                self.icon_sound_waves.setFixedSize(40, 40)
+                self.icon_sound_waves.setIcon(QIcon("./icon/audio-waves-32px.png"))
+
+                self.layout_bottom_bar.addWidget(self.icon_sound_waves)
+                self.layout_bottom_bar.addWidget(self.label_assistant_listening)
+                self.layout_bottom_bar.addStretch()
+
+            elif "1" in str(list(args)[0]):
                 self.layout_bottom_bar.addStretch()
                 self.layout_bottom_bar.addWidget(self.button_microphone)
+
             else:
                 text = str(list(args)[0])
                 self.label_user_answer = QLabel(text)
@@ -107,17 +123,7 @@ class UI_Windows(object):
                 self.layout_bottom_bar.addStretch()
 
         else:
-            self.label_assistant_listening = QLabel("Đang lắng nghe...")
-            self.label_assistant_listening.setObjectName("label_assistant_listening")
-
-            self.icon_sound_waves = QPushButton()
-            self.icon_sound_waves.setObjectName("icon_sound_waves")
-            self.icon_sound_waves.setFixedSize(40, 40)
-            self.icon_sound_waves.setIcon(QIcon("./icon/audio-waves-32px.png"))
-
-            self.layout_bottom_bar.addWidget(self.icon_sound_waves)
-            self.layout_bottom_bar.addWidget(self.label_assistant_listening)
-            self.layout_bottom_bar.addStretch()
+            pass
 
     def add_widget_space(self, height, layout):
         self.widget_space = QWidget()
@@ -146,7 +152,7 @@ class UI_Windows(object):
         self.layout_main_window.addStretch()
 
         self.layout_main_window.addWidget(self.widget_bottom_bar)
-        self.update_bottom_bar()
+        self.update_bottom_bar(0)
 
         MainWindow.layout_container.addWidget(self.widget_main_window)
         MainWindow.set_shadow_window()
@@ -222,7 +228,7 @@ class UI_Windows(object):
         self.layout_simple_window.addStretch()
 
         self.layout_simple_window.addWidget(self.widget_bottom_bar)
-        self.update_bottom_bar(0)
+        self.update_bottom_bar(1)
 
         MainWindow.layout_container.addWidget(self.widget_simple_window)
         MainWindow.set_shadow_window()
@@ -288,7 +294,7 @@ class UI_Windows(object):
         self.layout_clock_window.addStretch()
 
         self.layout_clock_window.addWidget(self.widget_bottom_bar)
-        self.update_bottom_bar(0)
+        self.update_bottom_bar(1)
 
         MainWindow.layout_container.addWidget(self.widget_clock_window)
         MainWindow.set_shadow_window()
@@ -397,6 +403,7 @@ class UI_Windows(object):
         self.clear_UI(MainWindow)
         self.widget_date_window = QWidget()
         self.widget_date_window.setObjectName("widget_date_window")
+        self.widget_date_window.setFixedSize(500, 450)
 
         self.layout_date_window = QVBoxLayout(self.widget_date_window)
         self.layout_date_window.setContentsMargins(0, 0, 0, 0)
@@ -418,7 +425,7 @@ class UI_Windows(object):
         self.layout_date_window.addStretch()
 
         self.layout_date_window.addWidget(self.widget_bottom_bar)
-        self.update_bottom_bar(0)
+        self.update_bottom_bar(1)
 
         MainWindow.layout_container.addWidget(self.widget_date_window)
         MainWindow.set_shadow_window()
@@ -482,14 +489,70 @@ class UI_Windows(object):
 
         self.layout_date_window.addWidget(self.widget_clock_in_date_window)
 
+    def setupUI_loading_window(self, MainWindow, text):
+        self.clear_UI(MainWindow)
+        self.widget_loading_window = QWidget()
+        self.widget_loading_window.setObjectName("widget_loading_window")
+        self.widget_loading_window.setFixedSize(500, 450)
+
+        self.layout_loading_window = QVBoxLayout(self.widget_loading_window)
+        self.layout_loading_window.setContentsMargins(0, 0, 0, 0)
+
+        self.layout_loading_window.addWidget(self.widget_title_bar)
+
+        self.loading_animated()
+
+        self.assistant_loading(text)
+
+        self.layout_loading_window.addStretch()
+
+        self.layout_loading_window.addWidget(self.widget_bottom_bar)
+
+        MainWindow.layout_container.addWidget(self.widget_loading_window)
+        MainWindow.set_shadow_window()
+        MainWindow.show()
+        MainWindow.set_center_screen()
+
+    def loading_animated(self):
+        self.widget_loading_animated = QWidget()
+        self.widget_loading_animated.setObjectName("widget_loading_animated")
+
+        self.layout_loading_animated = QHBoxLayout(self.widget_loading_animated)
+        self.layout_loading_animated.setContentsMargins(0, 0, 0, 0)
+
+        url_loading_gif = "./icon/Spin-1s-170px.gif"
+        loading_gif = QMovie(url_loading_gif)
+        loading_gif.start()
+
+        self.label_loading_animated = QLabel()
+        self.label_loading_animated.setMovie(loading_gif)
+        self.label_loading_animated.setScaledContents(True)
+        self.label_loading_animated.setFixedSize(170, 170)
+
+        self.layout_loading_animated.addWidget(self.label_loading_animated)
+
+        self.layout_loading_window.addWidget(self.widget_loading_animated)
+
+    def assistant_loading(self, text):
+        self.widget_assistant_loading = QWidget()
+        self.widget_assistant_loading.setObjectName("widget_assistant_loading")
+
+        self.layout_assistant_loading = QHBoxLayout(self.widget_assistant_loading)
+        self.layout_assistant_loading.setContentsMargins(0, 0, 0, 0)
+
+        self.label_assistant_loading = QLabel(text)
+        self.label_assistant_loading.setObjectName("label_assistant_loading")
+
+        self.layout_assistant_loading.addStretch()
+        self.layout_assistant_loading.addWidget(self.label_assistant_loading)
+        self.layout_assistant_loading.addStretch()
+
+        self.layout_loading_window.addWidget(self.widget_assistant_loading)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     MainWindow = Window()
     ui = UI_Windows()
-    ui.btn_close()
-    ui.btn_microphone()
-    ui.title_bar()
-    ui.bottom_bar()
-    ui.setupUI_clock_window(MainWindow)
+    ui.setupUI_loading_window(MainWindow, "Vui lòng đợi trong giây lát...")
     sys.exit(app.exec_())

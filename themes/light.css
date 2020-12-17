@@ -209,3 +209,45 @@ QLabel#label_assistant_loading {
   border-radius: 5px;
   padding: 10px;
 }
+
+/* Widget Weather Window */
+QWidget#widget_weather_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_city_name {
+  font: 20px;
+}
+
+QLabel#label_temp {
+  font: 50px;
+}
+
+QLabel#label_desc {
+  font: 20px;
+}
+
+QLabel#label_pressure {
+  font: 20px;
+}
+
+QLabel#label_humidity {
+  font: 20px;
+}
+
+QLabel#label_cloud {
+  font: 20px;
+}
+
+QLabel#label_wind {
+  font: 20px;
+}
+
+QLabel#label_uvi {
+  font: 20px;
+}
+
+QLabel#label_visible {
+  font: 20px;
+}

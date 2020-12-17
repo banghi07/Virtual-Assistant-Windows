@@ -30,11 +30,15 @@ class Window(QMainWindow):
         for i in range(self.layout_container.count()):
             self.layout_container.itemAt(i).widget().setGraphicsEffect(self.shadow)
 
-    def set_center_screen(self):
-        qr = self.frameGeometry()
-        center_point = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(center_point)
-        self.move(qr.topLeft())
+    def set_center_screen(self, width, height):
+        desktop = QDesktopWidget()
+        screen_width = desktop.width()
+        screen_height = desktop.height()
+
+        x = (screen_width - width) / 2
+        y = (screen_height - height) / 2
+
+        self.move(x, y)
 
 
 class UI_Windows(object):
@@ -69,7 +73,7 @@ class UI_Windows(object):
     def title_bar(self):
         self.widget_title_bar = QWidget()
         self.widget_title_bar.setObjectName("widget_title_bar")
-        self.widget_title_bar.setFixedSize(500, 35)
+        # self.widget_title_bar.setFixedSize(500, 35)
 
         self.layout_title_bar = QHBoxLayout(self.widget_title_bar)
         self.layout_title_bar.setContentsMargins(0, 0, 0, 0)
@@ -80,7 +84,7 @@ class UI_Windows(object):
     def bottom_bar(self):
         self.widget_bottom_bar = QWidget()
         self.widget_bottom_bar.setObjectName("widget_bottom_bar")
-        self.widget_bottom_bar.setFixedSize(500, 40)
+        # self.widget_bottom_bar.setFixedSize(500, 40)
 
         self.layout_bottom_bar = QHBoxLayout(self.widget_bottom_bar)
         self.layout_bottom_bar.setContentsMargins(0, 0, 0, 0)
@@ -125,11 +129,17 @@ class UI_Windows(object):
         else:
             pass
 
-    def add_widget_space(self, height, layout):
-        self.widget_space = QWidget()
-        self.widget_space.setFixedHeight(height)
+    def add_widget_spaceV(self, height, layout):
+        self.widget_spaceV = QWidget()
+        self.widget_spaceV.setFixedHeight(height)
 
-        layout.addWidget(self.widget_space)
+        layout.addWidget(self.widget_spaceV)
+
+    def add_widget_spaceH(self, width, layout):
+        self.widget_spaceH = QWidget()
+        self.widget_spaceH.setFixedWidth(width)
+
+        layout.addWidget(self.widget_spaceH)
 
     # * UI main window
     def setupUI_main_window(self, MainWindow):
@@ -141,6 +151,7 @@ class UI_Windows(object):
         self.layout_main_window = QVBoxLayout(self.widget_main_window)
         self.layout_main_window.setContentsMargins(0, 0, 0, 0)
 
+        self.widget_title_bar.setFixedSize(500, 35)
         self.layout_main_window.addWidget(self.widget_title_bar)
 
         self.listen_animated()
@@ -151,13 +162,14 @@ class UI_Windows(object):
 
         self.layout_main_window.addStretch()
 
+        self.widget_bottom_bar.setFixedSize(500, 40)
         self.layout_main_window.addWidget(self.widget_bottom_bar)
         self.update_bottom_bar(0)
 
         MainWindow.layout_container.addWidget(self.widget_main_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen()
+        MainWindow.set_center_screen(520, 470)
 
     def listen_animated(self):
         self.widget_listen_animated = QWidget()
@@ -218,6 +230,7 @@ class UI_Windows(object):
         self.widget_simple_window.setObjectName("widget_simple_window")
         self.widget_simple_window.setFixedSize(500, 450)
 
+        self.widget_title_bar.setFixedSize(500, 35)
         self.layout_simple_window = QVBoxLayout(self.widget_simple_window)
         self.layout_simple_window.setContentsMargins(0, 0, 0, 0)
 
@@ -227,13 +240,14 @@ class UI_Windows(object):
         self.assistant_answer(text)
         self.layout_simple_window.addStretch()
 
+        self.widget_bottom_bar.setFixedSize(500, 40)
         self.layout_simple_window.addWidget(self.widget_bottom_bar)
         self.update_bottom_bar(1)
 
         MainWindow.layout_container.addWidget(self.widget_simple_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen()
+        MainWindow.set_center_screen(520, 470)
 
     def icon_assistant_answer(self, url):
         self.widget_icon_answer = QWidget()
@@ -274,52 +288,34 @@ class UI_Windows(object):
         self.widget_clock_window.setObjectName("widget_clock_window")
         self.widget_clock_window.setFixedSize(500, 450)
 
+        self.widget_title_bar.setFixedSize(500, 35)
         self.layout_clock_window = QVBoxLayout(self.widget_clock_window)
         self.layout_clock_window.setContentsMargins(0, 0, 0, 0)
 
         self.layout_clock_window.addWidget(self.widget_title_bar)
-        self.add_widget_space(50, self.layout_clock_window)
+        self.add_widget_spaceV(50, self.layout_clock_window)
 
         s = result["zone_name"] + ", " + "UTC " + result["utc"]
         self.display_time_zone(s)
         self.layout_clock_window.addWidget(self.widget_time_zone)
-        self.add_widget_space(30, self.layout_clock_window)
+        self.add_widget_spaceV(30, self.layout_clock_window)
 
         self.display_clock(result["hour"], result["minute"], result["second"])
-        self.add_widget_space(15, self.layout_clock_window)
+        self.add_widget_spaceV(15, self.layout_clock_window)
 
         self.display_date_in_clock_window(
             result["day"], result["month"], result["year"]
         )
         self.layout_clock_window.addStretch()
 
+        self.widget_bottom_bar.setFixedSize(500, 40)
         self.layout_clock_window.addWidget(self.widget_bottom_bar)
         self.update_bottom_bar(1)
 
         MainWindow.layout_container.addWidget(self.widget_clock_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen()
-
-    # def display_city_name(self, text):
-    #     self.widget_city_name = QWidget()
-    #     self.widget_city_name.setObjectName("widget_city_name")
-
-    #     self.layout_city_name = QHBoxLayout(self.widget_city_name)
-    #     self.layout_city_name.setContentsMargins(0, 0, 0, 0)
-
-    #     self.icon_location_city_name = QLabel()
-    #     self.icon_location_city_name.setObjectName("icon_location_city_name")
-    #     self.icon_location_city_name.setFixedSize(35, 25)
-    #     self.icon_location_city_name.setScaledContents(True)
-    #     self.icon_location_city_name.setPixmap(QPixmap("./icon/placeholder-32px.png"))
-
-    #     self.label_city_name = QLabel(text)
-    #     self.label_city_name.setObjectName("label_city_name")
-
-    #     self.layout_city_name.addWidget(self.icon_location_city_name)
-    #     self.layout_city_name.addWidget(self.label_city_name)
-    #     self.layout_city_name.addStretch()
+        MainWindow.set_center_screen(520, 470)
 
     def display_time_zone(self, text):
         self.widget_time_zone = QWidget()
@@ -408,29 +404,31 @@ class UI_Windows(object):
         self.layout_date_window = QVBoxLayout(self.widget_date_window)
         self.layout_date_window.setContentsMargins(0, 0, 0, 0)
 
+        self.widget_title_bar.setFixedSize(500, 35)
         self.layout_date_window.addWidget(self.widget_title_bar)
-        self.add_widget_space(50, self.layout_date_window)
+        self.add_widget_spaceV(50, self.layout_date_window)
 
         s = result["zone_name"] + ", " + "UTC " + result["utc"]
         self.display_time_zone(s)
         self.layout_date_window.addWidget(self.widget_time_zone)
-        self.add_widget_space(30, self.layout_date_window)
+        self.add_widget_spaceV(30, self.layout_date_window)
 
         self.display_date(result["day"], result["month"], result["year"])
-        self.add_widget_space(15, self.layout_date_window)
+        self.add_widget_spaceV(15, self.layout_date_window)
 
         self.display_clock_in_date_window(
             result["hour"], result["minute"], result["second"]
         )
         self.layout_date_window.addStretch()
 
+        self.widget_bottom_bar.setFixedSize(500, 40)
         self.layout_date_window.addWidget(self.widget_bottom_bar)
         self.update_bottom_bar(1)
 
         MainWindow.layout_container.addWidget(self.widget_date_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen()
+        MainWindow.set_center_screen(520, 470)
 
     def display_date(self, d, m, y):
         self.widget_date = QWidget()
@@ -495,6 +493,7 @@ class UI_Windows(object):
         self.widget_loading_window.setObjectName("widget_loading_window")
         self.widget_loading_window.setFixedSize(500, 450)
 
+        self.widget_title_bar.setFixedSize(500, 35)
         self.layout_loading_window = QVBoxLayout(self.widget_loading_window)
         self.layout_loading_window.setContentsMargins(0, 0, 0, 0)
 
@@ -506,12 +505,13 @@ class UI_Windows(object):
 
         self.layout_loading_window.addStretch()
 
+        self.widget_bottom_bar.setFixedSize(500, 40)
         self.layout_loading_window.addWidget(self.widget_bottom_bar)
 
         MainWindow.layout_container.addWidget(self.widget_loading_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen()
+        MainWindow.set_center_screen(520, 470)
 
     def loading_animated(self):
         self.widget_loading_animated = QWidget()
@@ -549,10 +549,179 @@ class UI_Windows(object):
 
         self.layout_loading_window.addWidget(self.widget_assistant_loading)
 
+    def setupUI_weather_window(self, MainWindow, result):
+        self.clear_UI(MainWindow)
+        self.widget_weather_window = QWidget()
+        self.widget_weather_window.setObjectName("widget_weather_window")
+        self.widget_weather_window.setFixedSize(600, 500)
+
+        self.layout_weather_window = QVBoxLayout(self.widget_weather_window)
+        self.layout_weather_window.setContentsMargins(0, 0, 0, 0)
+
+        self.widget_title_bar.setFixedSize(600, 35)
+        self.layout_weather_window.addWidget(self.widget_title_bar)
+
+        self.display_city_name(result["city"])
+        self.layout_weather_window.addWidget(self.widget_city_name)
+
+        self.add_widget_spaceV(10, self.layout_weather_window)
+
+        self.icon_weather_and_temp(result["icon"], result["temp"])
+
+        self.add_widget_spaceV(10, self.layout_weather_window)
+
+        self.weather_description(result["feel_like"], result["desc"])
+
+        self.add_widget_spaceV(20, self.layout_weather_window)
+
+        self.display_weather_details(result)
+        self.layout_weather_window.addStretch()
+
+        self.widget_bottom_bar.setFixedSize(600, 40)
+        self.layout_weather_window.addWidget(self.widget_bottom_bar)
+        self.update_bottom_bar(1)
+
+        MainWindow.layout_container.addWidget(self.widget_weather_window)
+        MainWindow.set_shadow_window()
+        MainWindow.show()
+        MainWindow.set_center_screen(620, 520)
+
+    def display_city_name(self, text):
+        self.widget_city_name = QWidget()
+        self.widget_city_name.setObjectName("widget_city_name")
+
+        self.layout_city_name = QHBoxLayout(self.widget_city_name)
+        self.layout_city_name.setContentsMargins(0, 0, 0, 0)
+
+        self.icon_location_city_name = QLabel()
+        self.icon_location_city_name.setObjectName("icon_location_city_name")
+        self.icon_location_city_name.setFixedSize(29, 29)
+        self.icon_location_city_name.setScaledContents(True)
+        self.icon_location_city_name.setPixmap(QPixmap("./icon/placeholder-32px.png"))
+
+        self.label_city_name = QLabel(text)
+        self.label_city_name.setObjectName("label_city_name")
+
+        self.add_widget_spaceH(30, self.layout_city_name)
+        self.layout_city_name.addWidget(self.icon_location_city_name)
+        self.layout_city_name.addWidget(self.label_city_name)
+        self.layout_city_name.addStretch()
+
+    def icon_weather_and_temp(self, icon, temp):
+        self.widget_weather_and_temp = QWidget()
+        self.widget_weather_and_temp.setObjectName("widget_weather_and_temp")
+
+        self.layout_weather_and_temp = QHBoxLayout(self.widget_weather_and_temp)
+        self.layout_weather_and_temp.setContentsMargins(0, 0, 0, 0)
+
+        self.layout_weather_and_temp.addStretch()
+
+        no_icon_weather = icon
+        label_icon_weather = QLabel()
+        s = "./icon/weather/{}.png".format(no_icon_weather)
+        label_icon_weather.setPixmap(QPixmap(s))
+        label_icon_weather.setScaledContents(True)
+        label_icon_weather.setFixedSize(150, 150)
+        self.layout_weather_and_temp.addWidget(label_icon_weather)
+
+        self.add_widget_spaceH(70, self.layout_weather_and_temp)
+
+        s = "{}<sup>o</sup>C".format(temp)
+        label_temp = QLabel()
+        label_temp.setObjectName("label_temp")
+        label_temp.setTextFormat(Qt.RichText)
+        label_temp.setText(s)
+        label_temp.setAlignment(Qt.AlignCenter)
+        self.layout_weather_and_temp.addWidget(label_temp)
+
+        self.layout_weather_and_temp.addStretch()
+        self.layout_weather_window.addWidget(self.widget_weather_and_temp)
+
+    def weather_description(self, temp, desc):
+        self.widget_weather_description = QWidget()
+
+        self.layout_weather_description = QHBoxLayout(self.widget_weather_description)
+        self.layout_weather_description.setContentsMargins(0, 0, 0, 0)
+
+        s = "<b>Cảm giác như {}<sup>o</sup>C. {}.</b>".format(
+            round(temp), desc.capitalize()
+        )
+
+        label_desc = QLabel()
+        label_desc.setObjectName("label_desc")
+        label_desc.setTextFormat(Qt.RichText)
+        label_desc.setAlignment(Qt.AlignCenter)
+        label_desc.setText(s)
+
+        self.layout_weather_description.addStretch()
+        self.layout_weather_description.addWidget(label_desc)
+        self.layout_weather_description.addStretch()
+
+        self.layout_weather_window.addWidget(self.widget_weather_description)
+
+    def display_weather_details(self, result):
+        self.widget_weather_details = QWidget()
+        self.layout_weather_details = QHBoxLayout(self.widget_weather_details)
+        self.layout_weather_details.setContentsMargins(0, 0, 0, 0)
+
+        self.widget_weather_details_child = QWidget()
+        self.layout_weather_details_child = QGridLayout(
+            self.widget_weather_details_child
+        )
+        self.layout_weather_details_child.setContentsMargins(0, 0, 0, 0)
+
+        s = "Áp suất: {}hPa".format(result["pressure"])
+        label_pressure = QLabel()
+        label_pressure.setObjectName("label_pressure")
+        label_pressure.setText(s)
+        self.layout_weather_details_child.addWidget(label_pressure, 0, 0)
+
+        s = "Độ ẩm: {}%".format(result["humidity"])
+        label_humidity = QLabel()
+        label_humidity.setObjectName("label_humidity")
+        label_humidity.setText(s)
+        self.layout_weather_details_child.addWidget(label_humidity, 0, 2)
+
+        s = "Có mây: {}%".format(result["cloud"])
+        label_cloud = QLabel()
+        label_cloud.setObjectName("label_cloud")
+        label_cloud.setText(s)
+        self.layout_weather_details_child.addWidget(label_cloud, 1, 0)
+
+        s = "Tốc độ gió: {}m/s".format(result["wind_speed"])
+        label_wind = QLabel()
+        label_wind.setObjectName("label_wind")
+        label_wind.setText(s)
+        self.layout_weather_details_child.addWidget(label_wind, 1, 2)
+
+        s = "Chỉ số UV: {}".format(result["uvi"])
+        label_uvi = QLabel()
+        label_uvi.setObjectName("label_uvi")
+        label_uvi.setText(s)
+        self.layout_weather_details_child.addWidget(label_uvi, 2, 0)
+
+        v = int(result["visibility"]) / 1000
+        s = "Tầm nhìn xa: {}km".format(v)
+        label_visible = QLabel()
+        label_visible.setObjectName("label_visible")
+        label_visible.setText(s)
+        self.layout_weather_details_child.addWidget(label_visible, 2, 2)
+
+        for i in range(3):
+            widget_middle = QWidget()
+            widget_middle.setFixedWidth(50)
+            self.layout_weather_details_child.addWidget(widget_middle, i, 1)
+
+        self.layout_weather_details.addStretch()
+        self.layout_weather_details.addWidget(self.widget_weather_details_child)
+        self.layout_weather_details.addStretch()
+
+        self.layout_weather_window.addWidget(self.widget_weather_details)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     MainWindow = Window()
     ui = UI_Windows()
-    ui.setupUI_loading_window(MainWindow, "Vui lòng đợi trong giây lát...")
+    ui.setupUI_weather_window(MainWindow)
     sys.exit(app.exec_())

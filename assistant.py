@@ -153,6 +153,8 @@ class Assistant:
                 delay.signals.finished.connect(self.get_date_thread)
         elif "mở video" in text or "mở bài" in text:
             delay.signals.args.connect(self.play_song_thread)
+        elif "thời tiết" in text:
+            delay.signals.args.connect(self.what_weather_thread)
 
         self.threadpool.start(delay)
 
@@ -302,6 +304,101 @@ class Assistant:
 
     def play_song_complete(self):
         self.MainWindow.close()
+
+    def what_weather_thread(self, args):
+        text = list(args)[0]
+
+        if "tỉnh" in text:
+            reg_ex = re.search("tỉnh", text)
+            start = reg_ex.end() + 1
+            end = len(text)
+            city = text[start:end]
+            if city == "":
+                city = "none"
+        elif "thành phố" in text:
+            reg_ex = re.search("thành phố", text)
+            start = reg_ex.end() + 1
+            end = len(text)
+            city = text[start:end]
+            if city == "":
+                city = "none"
+        else:
+            city = "default"
+
+        if "none" in city:
+            pass
+        else:
+            self.thread = Thread(self.what_weather, city, "what_weather")
+            self.thread.signals.result.connect(self.what_weather_complete)
+            self.thread.signals.running.connect(self.update_thread_list)
+            self.threadpool.start(self.thread)
+
+    def what_weather(self, city):
+        if "default" in city:
+            location = self.get_location_from_ip()
+
+            geolocator = Nominatim(user_agent="Virtual Assistant")
+            display_name = geolocator.geocode(location["city"]).address
+
+            lat = location["lat"]
+            lon = location["lon"]
+
+        else:
+            geolocator = Nominatim(user_agent="Virtual Assistant")
+            location = geolocator.geocode(city)
+
+            display_name = location.address
+            lat = location.latitude
+            lon = location.longitude
+
+        api = "4e7ced343986de64b7f54296a111c208"
+        part = "minutely,hourly,daily,alerts"
+        units = "metric"
+        lang = "vi"
+        url = "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude={}&units={}&lang={}&appid={}"
+        url_one_call = url.format(lat, lon, part, units, lang, api)
+        response = requests.get(url_one_call).json()
+
+        c_cur_time = response["current"]["dt"]
+        c_sunrise = response["current"]["sunrise"]
+        c_sunset = response["current"]["sunset"]
+        c_temp = response["current"]["temp"]
+        c_feel_like = response["current"]["feels_like"]
+        c_pressure = response["current"]["pressure"]
+        c_humidity = response["current"]["humidity"]
+        c_dew_point = response["current"]["dew_point"]
+        c_clouds = response["current"]["clouds"]
+        c_uvi = response["current"]["uvi"]
+        c_visibility = response["current"]["visibility"]
+        c_wind_speed = response["current"]["wind_speed"]
+        c_wind_deg = response["current"]["wind_deg"]
+        c_weather_id = response["current"]["weather"][0]["id"]
+        c_weather_main = response["current"]["weather"][0]["main"]
+        c_weather_description = response["current"]["weather"][0]["description"]
+        c_weather_icon = response["current"]["weather"][0]["icon"]
+
+        result = {
+            "city": display_name,
+            "icon": c_weather_icon,
+            "feel_like": c_feel_like,
+            "desc": c_weather_description,
+            "temp": c_temp,
+            "pressure": c_pressure,
+            "humidity": c_humidity,
+            "cloud": c_clouds,
+            "wind_deg": c_wind_deg,
+            "wind_speed": c_wind_speed,
+            "uvi": c_uvi,
+            "visibility": c_visibility,
+        }
+        return result
+
+    def what_weather_complete(self, result):
+        speech = "Dự báo thời tiết cho {}. {}. nhiệt độ là {} độ C.".format(
+            result["city"], result["desc"], result["temp"]
+        )
+        self.ui.setupUI_weather_window(self.MainWindow, result)
+        self.speak_thread(speech)
 
 
 if __name__ == "__main__":

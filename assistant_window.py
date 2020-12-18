@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import webbrowser
 
 
 class Window(QMainWindow):
@@ -30,24 +31,25 @@ class Window(QMainWindow):
         for i in range(self.layout_container.count()):
             self.layout_container.itemAt(i).widget().setGraphicsEffect(self.shadow)
 
-    def set_center_screen(self, width, height):
+    def set_center_screen(self):
         desktop = QDesktopWidget()
         screen_width = desktop.width()
         screen_height = desktop.height()
 
-        x = (screen_width - width) / 2
-        y = (screen_height - height) / 2
+        x = (screen_width - self.width()) / 2
+        y = (screen_height - self.height()) / 2
 
-        self.move(x, y)
+        self.move(round(x), round(y))
 
 
 class UI_Windows(object):
     # * Init button, title & bottom bar
     def __init__(self):
-        self.btn_close()
-        self.btn_microphone()
-        self.title_bar()
-        self.bottom_bar()
+        self.init_button_close()
+        self.init_button_microphone()
+        self.init_topic_button()
+        self.init_title_bar()
+        self.init_bottom_bar()
 
     def clear_layout(self, layout):
         while layout.count():
@@ -58,22 +60,37 @@ class UI_Windows(object):
     def clear_UI(self, MainWindow):
         self.clear_layout(MainWindow.layout_container)
 
-    def btn_close(self):
+    def init_button_close(self):
         self.button_close = QPushButton()
         self.button_close.setObjectName("button_close")
         self.button_close.setFixedSize(35, 35)
         self.button_close.setIcon(QIcon("./icon/close-32px.png"))
 
-    def btn_microphone(self):
+    def init_button_microphone(self):
         self.button_microphone = QPushButton()
         self.button_microphone.setObjectName("button_microphone")
         self.button_microphone.setFixedSize(40, 40)
         self.button_microphone.setIcon(QIcon("./icon/microphone-32px.png"))
 
-    def title_bar(self):
+    def init_topic_button(self):
+        self.topic_button_1 = QPushButton("Mới Nhất")
+        self.topic_button_1.setObjectName("topic_button_1")
+
+        self.topic_button_2 = QPushButton("Nổi Bật")
+        self.topic_button_2.setObjectName("topic_button_2")
+
+        self.topic_button_3 = QPushButton("Giải trí")
+        self.topic_button_3.setObjectName("topic_button_3")
+
+        self.topic_button_4 = QPushButton("Thể Thao")
+        self.topic_button_4.setObjectName("topic_button_4")
+
+        self.topic_button_5 = QPushButton("Khoa Học")
+        self.topic_button_5.setObjectName("topic_button_5")
+
+    def init_title_bar(self):
         self.widget_title_bar = QWidget()
         self.widget_title_bar.setObjectName("widget_title_bar")
-        # self.widget_title_bar.setFixedSize(500, 35)
 
         self.layout_title_bar = QHBoxLayout(self.widget_title_bar)
         self.layout_title_bar.setContentsMargins(0, 0, 0, 0)
@@ -81,10 +98,9 @@ class UI_Windows(object):
         self.layout_title_bar.addStretch()
         self.layout_title_bar.addWidget(self.button_close)
 
-    def bottom_bar(self):
+    def init_bottom_bar(self):
         self.widget_bottom_bar = QWidget()
         self.widget_bottom_bar.setObjectName("widget_bottom_bar")
-        # self.widget_bottom_bar.setFixedSize(500, 40)
 
         self.layout_bottom_bar = QHBoxLayout(self.widget_bottom_bar)
         self.layout_bottom_bar.setContentsMargins(0, 0, 0, 0)
@@ -129,24 +145,25 @@ class UI_Windows(object):
         else:
             pass
 
-    def add_widget_spaceV(self, height, layout):
-        self.widget_spaceV = QWidget()
-        self.widget_spaceV.setFixedHeight(height)
+    def add_widget_space_vertical(self, height, layout):
+        widget_spaceV = QWidget()
+        widget_spaceV.setFixedHeight(height)
 
-        layout.addWidget(self.widget_spaceV)
+        layout.addWidget(widget_spaceV)
 
-    def add_widget_spaceH(self, width, layout):
-        self.widget_spaceH = QWidget()
-        self.widget_spaceH.setFixedWidth(width)
+    def add_widget_space_horizontal(self, width, layout):
+        widget_spaceH = QWidget()
+        widget_spaceH.setFixedWidth(width)
 
-        layout.addWidget(self.widget_spaceH)
+        layout.addWidget(widget_spaceH)
 
     # * UI main window
     def setupUI_main_window(self, MainWindow):
         self.clear_UI(MainWindow)
+        MainWindow.setFixedSize(520, 470)
+
         self.widget_main_window = QWidget()
         self.widget_main_window.setObjectName("widget_main_window")
-        self.widget_main_window.setFixedSize(500, 450)
 
         self.layout_main_window = QVBoxLayout(self.widget_main_window)
         self.layout_main_window.setContentsMargins(0, 0, 0, 0)
@@ -154,11 +171,11 @@ class UI_Windows(object):
         self.widget_title_bar.setFixedSize(500, 35)
         self.layout_main_window.addWidget(self.widget_title_bar)
 
-        self.listen_animated()
+        self.display_listen_animated()
 
-        self.assistant_ask()
+        self.display_assistant_ask()
 
-        self.assistant_hint()
+        self.display_assistant_hint()
 
         self.layout_main_window.addStretch()
 
@@ -169,9 +186,9 @@ class UI_Windows(object):
         MainWindow.layout_container.addWidget(self.widget_main_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen(520, 470)
+        MainWindow.set_center_screen()
 
-    def listen_animated(self):
+    def display_listen_animated(self):
         self.widget_listen_animated = QWidget()
         self.widget_listen_animated.setObjectName("widget_listen_animated")
 
@@ -191,7 +208,7 @@ class UI_Windows(object):
 
         self.layout_main_window.addWidget(self.widget_listen_animated)
 
-    def assistant_ask(self):
+    def display_assistant_ask(self):
         self.widget_assistant_ask = QWidget()
         self.widget_assistant_ask.setObjectName("widget_assistant_ask")
 
@@ -207,7 +224,7 @@ class UI_Windows(object):
 
         self.layout_main_window.addWidget(self.widget_assistant_ask)
 
-    def assistant_hint(self):
+    def display_assistant_hint(self):
         self.widget_assistant_hint = QWidget()
         self.widget_assistant_hint.setObjectName("widget_assistant_hint")
 
@@ -226,9 +243,10 @@ class UI_Windows(object):
     # * UI simple window
     def setupUI_simple_window(self, MainWindow, url, text):
         self.clear_UI(MainWindow)
+        MainWindow.setFixedSize(520, 470)
+
         self.widget_simple_window = QWidget()
         self.widget_simple_window.setObjectName("widget_simple_window")
-        self.widget_simple_window.setFixedSize(500, 450)
 
         self.widget_title_bar.setFixedSize(500, 35)
         self.layout_simple_window = QVBoxLayout(self.widget_simple_window)
@@ -236,8 +254,8 @@ class UI_Windows(object):
 
         self.layout_simple_window.addWidget(self.widget_title_bar)
 
-        self.icon_assistant_answer(url)
-        self.assistant_answer(text)
+        self.display_icon_assistant_answer(url)
+        self.display_assistant_answer(text)
         self.layout_simple_window.addStretch()
 
         self.widget_bottom_bar.setFixedSize(500, 40)
@@ -247,9 +265,9 @@ class UI_Windows(object):
         MainWindow.layout_container.addWidget(self.widget_simple_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen(520, 470)
+        MainWindow.set_center_screen()
 
-    def icon_assistant_answer(self, url):
+    def display_icon_assistant_answer(self, url):
         self.widget_icon_answer = QWidget()
         self.widget_icon_answer.setObjectName("widget_icon_assistant_answer")
 
@@ -266,7 +284,7 @@ class UI_Windows(object):
 
         self.layout_simple_window.addWidget(self.widget_icon_answer)
 
-    def assistant_answer(self, text):
+    def display_assistant_answer(self, text):
         self.widget_assistant_answer = QWidget()
         self.widget_assistant_answer.setObjectName("widget_assistant_answer")
 
@@ -284,24 +302,25 @@ class UI_Windows(object):
 
     def setupUI_clock_window(self, MainWindow, result):
         self.clear_UI(MainWindow)
+        MainWindow.setFixedSize(520, 470)
+
         self.widget_clock_window = QWidget()
         self.widget_clock_window.setObjectName("widget_clock_window")
-        self.widget_clock_window.setFixedSize(500, 450)
 
-        self.widget_title_bar.setFixedSize(500, 35)
         self.layout_clock_window = QVBoxLayout(self.widget_clock_window)
         self.layout_clock_window.setContentsMargins(0, 0, 0, 0)
 
+        self.widget_title_bar.setFixedSize(500, 35)
         self.layout_clock_window.addWidget(self.widget_title_bar)
-        self.add_widget_spaceV(50, self.layout_clock_window)
+        self.add_widget_space_vertical(50, self.layout_clock_window)
 
         s = result["zone_name"] + ", " + "UTC " + result["utc"]
         self.display_time_zone(s)
         self.layout_clock_window.addWidget(self.widget_time_zone)
-        self.add_widget_spaceV(30, self.layout_clock_window)
+        self.add_widget_space_vertical(30, self.layout_clock_window)
 
         self.display_clock(result["hour"], result["minute"], result["second"])
-        self.add_widget_spaceV(15, self.layout_clock_window)
+        self.add_widget_space_vertical(15, self.layout_clock_window)
 
         self.display_date_in_clock_window(
             result["day"], result["month"], result["year"]
@@ -315,7 +334,7 @@ class UI_Windows(object):
         MainWindow.layout_container.addWidget(self.widget_clock_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen(520, 470)
+        MainWindow.set_center_screen()
 
     def display_time_zone(self, text):
         self.widget_time_zone = QWidget()
@@ -397,24 +416,25 @@ class UI_Windows(object):
 
     def setupUI_date_window(self, MainWindow, result):
         self.clear_UI(MainWindow)
+        MainWindow.setFixedSize(520, 470)
+
         self.widget_date_window = QWidget()
         self.widget_date_window.setObjectName("widget_date_window")
-        self.widget_date_window.setFixedSize(500, 450)
 
         self.layout_date_window = QVBoxLayout(self.widget_date_window)
         self.layout_date_window.setContentsMargins(0, 0, 0, 0)
 
         self.widget_title_bar.setFixedSize(500, 35)
         self.layout_date_window.addWidget(self.widget_title_bar)
-        self.add_widget_spaceV(50, self.layout_date_window)
+        self.add_widget_space_vertical(50, self.layout_date_window)
 
         s = result["zone_name"] + ", " + "UTC " + result["utc"]
         self.display_time_zone(s)
         self.layout_date_window.addWidget(self.widget_time_zone)
-        self.add_widget_spaceV(30, self.layout_date_window)
+        self.add_widget_space_vertical(30, self.layout_date_window)
 
         self.display_date(result["day"], result["month"], result["year"])
-        self.add_widget_spaceV(15, self.layout_date_window)
+        self.add_widget_space_vertical(15, self.layout_date_window)
 
         self.display_clock_in_date_window(
             result["hour"], result["minute"], result["second"]
@@ -428,7 +448,7 @@ class UI_Windows(object):
         MainWindow.layout_container.addWidget(self.widget_date_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen(520, 470)
+        MainWindow.set_center_screen()
 
     def display_date(self, d, m, y):
         self.widget_date = QWidget()
@@ -489,9 +509,10 @@ class UI_Windows(object):
 
     def setupUI_loading_window(self, MainWindow, text):
         self.clear_UI(MainWindow)
+        MainWindow.setFixedSize(520, 470)
+
         self.widget_loading_window = QWidget()
         self.widget_loading_window.setObjectName("widget_loading_window")
-        self.widget_loading_window.setFixedSize(500, 450)
 
         self.widget_title_bar.setFixedSize(500, 35)
         self.layout_loading_window = QVBoxLayout(self.widget_loading_window)
@@ -499,9 +520,9 @@ class UI_Windows(object):
 
         self.layout_loading_window.addWidget(self.widget_title_bar)
 
-        self.loading_animated()
+        self.display_loading_animated()
 
-        self.assistant_loading(text)
+        self.display_assistant_loading(text)
 
         self.layout_loading_window.addStretch()
 
@@ -511,9 +532,9 @@ class UI_Windows(object):
         MainWindow.layout_container.addWidget(self.widget_loading_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen(520, 470)
+        MainWindow.set_center_screen()
 
-    def loading_animated(self):
+    def display_loading_animated(self):
         self.widget_loading_animated = QWidget()
         self.widget_loading_animated.setObjectName("widget_loading_animated")
 
@@ -533,7 +554,7 @@ class UI_Windows(object):
 
         self.layout_loading_window.addWidget(self.widget_loading_animated)
 
-    def assistant_loading(self, text):
+    def display_assistant_loading(self, text):
         self.widget_assistant_loading = QWidget()
         self.widget_assistant_loading.setObjectName("widget_assistant_loading")
 
@@ -551,40 +572,41 @@ class UI_Windows(object):
 
     def setupUI_weather_window(self, MainWindow, result):
         self.clear_UI(MainWindow)
+        MainWindow.setFixedSize(570, 470)
+
         self.widget_weather_window = QWidget()
         self.widget_weather_window.setObjectName("widget_weather_window")
-        self.widget_weather_window.setFixedSize(600, 500)
 
         self.layout_weather_window = QVBoxLayout(self.widget_weather_window)
         self.layout_weather_window.setContentsMargins(0, 0, 0, 0)
 
-        self.widget_title_bar.setFixedSize(600, 35)
+        self.widget_title_bar.setFixedSize(550, 35)
         self.layout_weather_window.addWidget(self.widget_title_bar)
 
         self.display_city_name(result["city"])
         self.layout_weather_window.addWidget(self.widget_city_name)
 
-        self.add_widget_spaceV(10, self.layout_weather_window)
+        self.add_widget_space_vertical(15, self.layout_weather_window)
 
-        self.icon_weather_and_temp(result["icon"], result["temp"])
+        self.display_icon_weather_and_temp(result["icon"], result["temp"])
 
-        self.add_widget_spaceV(10, self.layout_weather_window)
+        self.add_widget_space_vertical(15, self.layout_weather_window)
 
-        self.weather_description(result["feel_like"], result["desc"])
+        self.display_weather_description(result["feel_like"], result["desc"])
 
-        self.add_widget_spaceV(20, self.layout_weather_window)
+        self.add_widget_space_vertical(10, self.layout_weather_window)
 
         self.display_weather_details(result)
         self.layout_weather_window.addStretch()
 
-        self.widget_bottom_bar.setFixedSize(600, 40)
+        self.widget_bottom_bar.setFixedSize(550, 40)
         self.layout_weather_window.addWidget(self.widget_bottom_bar)
         self.update_bottom_bar(1)
 
         MainWindow.layout_container.addWidget(self.widget_weather_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
-        MainWindow.set_center_screen(620, 520)
+        MainWindow.set_center_screen()
 
     def display_city_name(self, text):
         self.widget_city_name = QWidget()
@@ -595,19 +617,19 @@ class UI_Windows(object):
 
         self.icon_location_city_name = QLabel()
         self.icon_location_city_name.setObjectName("icon_location_city_name")
-        self.icon_location_city_name.setFixedSize(29, 29)
+        self.icon_location_city_name.setFixedSize(23, 23)
         self.icon_location_city_name.setScaledContents(True)
         self.icon_location_city_name.setPixmap(QPixmap("./icon/placeholder-32px.png"))
 
         self.label_city_name = QLabel(text)
         self.label_city_name.setObjectName("label_city_name")
 
-        self.add_widget_spaceH(30, self.layout_city_name)
+        self.add_widget_space_horizontal(30, self.layout_city_name)
         self.layout_city_name.addWidget(self.icon_location_city_name)
         self.layout_city_name.addWidget(self.label_city_name)
         self.layout_city_name.addStretch()
 
-    def icon_weather_and_temp(self, icon, temp):
+    def display_icon_weather_and_temp(self, icon, temp):
         self.widget_weather_and_temp = QWidget()
         self.widget_weather_and_temp.setObjectName("widget_weather_and_temp")
 
@@ -621,10 +643,10 @@ class UI_Windows(object):
         s = "./icon/weather/{}.png".format(no_icon_weather)
         label_icon_weather.setPixmap(QPixmap(s))
         label_icon_weather.setScaledContents(True)
-        label_icon_weather.setFixedSize(150, 150)
+        label_icon_weather.setFixedSize(130, 130)
         self.layout_weather_and_temp.addWidget(label_icon_weather)
 
-        self.add_widget_spaceH(70, self.layout_weather_and_temp)
+        self.add_widget_space_horizontal(70, self.layout_weather_and_temp)
 
         s = "{}<sup>o</sup>C".format(temp)
         label_temp = QLabel()
@@ -637,7 +659,7 @@ class UI_Windows(object):
         self.layout_weather_and_temp.addStretch()
         self.layout_weather_window.addWidget(self.widget_weather_and_temp)
 
-    def weather_description(self, temp, desc):
+    def display_weather_description(self, temp, desc):
         self.widget_weather_description = QWidget()
 
         self.layout_weather_description = QHBoxLayout(self.widget_weather_description)
@@ -650,7 +672,6 @@ class UI_Windows(object):
         label_desc = QLabel()
         label_desc.setObjectName("label_desc")
         label_desc.setTextFormat(Qt.RichText)
-        label_desc.setAlignment(Qt.AlignCenter)
         label_desc.setText(s)
 
         self.layout_weather_description.addStretch()
@@ -718,10 +739,184 @@ class UI_Windows(object):
 
         self.layout_weather_window.addWidget(self.widget_weather_details)
 
+    def setupUI_news_window(self, MainWindow, result):
+        self.clear_UI(MainWindow)
+        MainWindow.setFixedSize(720, 820)
+
+        self.widget_news_window = QWidget()
+        self.widget_news_window.setObjectName("widget_news_window")
+
+        self.layout_news_window = QVBoxLayout(self.widget_news_window)
+        self.layout_news_window.setContentsMargins(0, 0, 0, 0)
+        self.layout_news_window.setSpacing(0)
+
+        self.widget_title_bar.setFixedSize(700, 35)
+        self.layout_news_window.addWidget(self.widget_title_bar)
+
+        # title_news = QLabel("<b>Tin Tức VNExpress</b>")
+        # title_news.setObjectName("title_news")
+        # title_news.setTextFormat(Qt.RichText)
+        # self.layout_news_window.addWidget(title_news)
+
+        self.display_topic_buttons()
+
+        self.display_topic_content()
+        self.update_topic_content(MainWindow, result)
+
+        self.widget_bottom_bar.setFixedSize(700, 40)
+        self.layout_news_window.addWidget(self.widget_bottom_bar)
+        self.update_bottom_bar(1)
+
+        MainWindow.layout_container.addWidget(self.widget_news_window)
+        MainWindow.set_shadow_window()
+        MainWindow.show()
+        MainWindow.set_center_screen()
+
+    def display_topic_buttons(self):
+        self.widget_topic_buttons = QWidget()
+        self.widget_topic_buttons.setObjectName("widget_topic_buttons")
+
+        self.layout_topic_buttons = QHBoxLayout(self.widget_topic_buttons)
+        self.layout_topic_buttons.setContentsMargins(10, 0, 10, 10)
+
+        self.layout_topic_buttons.addWidget(self.topic_button_1)
+        self.layout_topic_buttons.addWidget(self.topic_button_2)
+        self.layout_topic_buttons.addWidget(self.topic_button_3)
+        self.layout_topic_buttons.addWidget(self.topic_button_4)
+        self.layout_topic_buttons.addWidget(self.topic_button_5)
+        self.layout_topic_buttons.addStretch()
+
+        self.layout_news_window.addWidget(self.widget_topic_buttons)
+
+    def update_topic_buttons(self, opt):
+        if opt == 1:
+            self.topic_button_1.setDisabled(True)
+            self.topic_button_2.setEnabled(True)
+            self.topic_button_3.setEnabled(True)
+            self.topic_button_4.setEnabled(True)
+            self.topic_button_5.setEnabled(True)
+        elif opt == 2:
+            self.topic_button_2.setDisabled(True)
+            self.topic_button_1.setEnabled(True)
+            self.topic_button_3.setEnabled(True)
+            self.topic_button_4.setEnabled(True)
+            self.topic_button_5.setEnabled(True)
+        elif opt == 3:
+            self.topic_button_3.setDisabled(True)
+            self.topic_button_1.setEnabled(True)
+            self.topic_button_2.setEnabled(True)
+            self.topic_button_4.setEnabled(True)
+            self.topic_button_5.setEnabled(True)
+        elif opt == 4:
+            self.topic_button_4.setDisabled(True)
+            self.topic_button_1.setEnabled(True)
+            self.topic_button_2.setEnabled(True)
+            self.topic_button_3.setEnabled(True)
+            self.topic_button_5.setEnabled(True)
+        elif opt == 5:
+            self.topic_button_5.setDisabled(True)
+            self.topic_button_1.setEnabled(True)
+            self.topic_button_2.setEnabled(True)
+            self.topic_button_3.setEnabled(True)
+            self.topic_button_4.setEnabled(True)
+
+    def display_topic_content(self):
+        self.widget_topic_content = QWidget()
+        self.widget_topic_content.setObjectName("widget_topic_content")
+
+        self.layout_topic_content = QVBoxLayout(self.widget_topic_content)
+        self.layout_topic_content.setContentsMargins(0, 0, 0, 0)
+
+        self.layout_news_window.addWidget(self.widget_topic_content)
+
+    def update_topic_content(self, MainWindow, result):
+        self.clear_layout(self.layout_topic_content)
+
+        self.scroll_area_news = QScrollArea(self.widget_topic_content)
+        self.scroll_area_news.setObjectName("scroll_area_news")
+
+        self.scroll_area_news_content = QWidget()
+        self.scroll_area_news_content.setObjectName("scroll_area_news_content")
+
+        self.layout_scroll_area_news_content = QVBoxLayout(
+            self.scroll_area_news_content
+        )
+        self.layout_scroll_area_news_content.setContentsMargins(10, 10, 10, 10)
+        self.layout_scroll_area_news_content.setSpacing(10)
+
+        for i in range(10):
+            self.display_news_widget(MainWindow, result[str(i)])
+
+        button_see_more_news = QPushButton("Xem thêm nhiều tin tức khác cùng chủ đề...")
+        button_see_more_news.setObjectName("button_see_more_news")
+        button_see_more_news.clicked.connect(
+            lambda: self.open_url_to_read_more(MainWindow, result["see_more"])
+        )
+        self.layout_scroll_area_news_content.addWidget(button_see_more_news)
+
+        self.scroll_area_news.setWidget(self.scroll_area_news_content)
+        self.layout_topic_content.addWidget(self.scroll_area_news)
+
+    def display_news_widget(self, MainWindow, article):
+        widget_news = QWidget()
+        widget_news.setObjectName("widget_news")
+        widget_news.setFixedSize(661, 150)
+
+        layout_news = QHBoxLayout(widget_news)
+        layout_news.setContentsMargins(0, 0, 0, 0)
+
+        cover_image = QLabel()
+        cover_image.setObjectName("cover_image")
+        cover_image.setPixmap(QPixmap(article["cover_img"]))
+        cover_image.setScaledContents(True)
+        cover_image.setFixedSize(210, 150)
+
+        widget_details = QWidget()
+        layout_details = QVBoxLayout(widget_details)
+        layout_details.setContentsMargins(5, 5, 5, 5)
+
+        s = "<b>" + article["title"] + "</b>"
+        label_title_news = QLabel(s)
+        label_title_news.setObjectName("label_title_news")
+        label_title_news.setTextFormat(Qt.RichText)
+        label_title_news.setWordWrap(True)
+
+        label_desc_news = QLabel(article["desc"])
+        label_desc_news.setObjectName("label_desc_news")
+        label_desc_news.setWordWrap(True)
+
+        widget_contain_button = QWidget()
+        layout_widget_contain_button = QHBoxLayout(widget_contain_button)
+        layout_widget_contain_button.setContentsMargins(0, 0, 0, 0)
+
+        button_read_more = QPushButton("Đọc tiếp...")
+        button_read_more.setObjectName("button_read_more")
+        button_read_more.setFixedSize(85, 27)
+        button_read_more.clicked.connect(
+            lambda: self.open_url_to_read_more(MainWindow, article["link"])
+        )
+
+        layout_widget_contain_button.addStretch()
+        layout_widget_contain_button.addWidget(button_read_more)
+
+        layout_details.addWidget(label_title_news)
+        layout_details.addWidget(label_desc_news)
+        layout_details.addStretch()
+        layout_details.addWidget(widget_contain_button)
+
+        layout_news.addWidget(cover_image)
+        layout_news.addWidget(widget_details)
+
+        self.layout_scroll_area_news_content.addWidget(widget_news)
+
+    def open_url_to_read_more(self, MainWindow, url):
+        MainWindow.close()
+        webbrowser.open(url)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     MainWindow = Window()
     ui = UI_Windows()
-    ui.setupUI_weather_window(MainWindow)
+    ui.setupUI_news_window(MainWindow)
     sys.exit(app.exec_())

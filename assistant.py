@@ -117,6 +117,11 @@ class Assistant:
     def ui_button_connect(self):
         self.ui.button_close.clicked.connect(self.close_window)
         self.ui.button_microphone.clicked.connect(self.initial_assistant)
+        self.ui.topic_button_1.clicked.connect(lambda: self.search_news_thread(1))
+        self.ui.topic_button_2.clicked.connect(lambda: self.search_news_thread(2))
+        self.ui.topic_button_3.clicked.connect(lambda: self.search_news_thread(3))
+        self.ui.topic_button_4.clicked.connect(lambda: self.search_news_thread(4))
+        self.ui.topic_button_5.clicked.connect(lambda: self.search_news_thread(5))
 
     def close_window(self):
         QCoreApplication.exit()
@@ -155,6 +160,8 @@ class Assistant:
             delay.signals.args.connect(self.play_song_thread)
         elif "thời tiết" in text:
             delay.signals.args.connect(self.what_weather_thread)
+        elif "tin tức" in text:
+            delay.signals.finished.connect(self.search_news_thread)
 
         self.threadpool.start(delay)
 
@@ -394,11 +401,132 @@ class Assistant:
         return result
 
     def what_weather_complete(self, result):
-        speech = "Dự báo thời tiết cho {}. {}. nhiệt độ là {} độ C.".format(
-            result["city"], result["desc"], result["temp"]
+        speech = "Dự báo thời tiết cho {}. Nhiệt độ là {} độ C, {}.".format(
+            result["city"], result["temp"], result["desc"]
         )
         self.ui.setupUI_weather_window(self.MainWindow, result)
         self.speak_thread(speech)
+
+    def search_news_thread(self, opt=0):
+        self.thread = Thread(self.search_news, opt, "search_news")
+        self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.result.connect(self.search_news_complete)
+        self.threadpool.start(self.thread)
+
+    def search_news(self, opt):
+        def split_content(text):
+            i_desc = text.rfind(">")
+            i_start_img = text.rfind("src=")
+            i_end_img = text.rfind("/>")
+
+            if i_start_img == -1:
+                image_cover = "none"
+            else:
+                link_image = text[i_start_img + 5 : i_end_img - 2]
+                image_cover = link_image.replace("amp;", "")
+
+            description = text[i_desc + 1 :]
+            content = {"desc": description, "l_img": image_cover}
+
+            return content
+
+        if opt == 0:
+            url = "https://vnexpress.net/rss/tin-moi-nhat.rss"
+        elif opt == 1:
+            url = "https://vnexpress.net/rss/tin-moi-nhat.rss"
+        elif opt == 2:
+            url = "https://vnexpress.net/rss/tin-noi-bat.rss"
+        elif opt == 3:
+            url = "https://vnexpress.net/rss/giai-tri.rss"
+        elif opt == 4:
+            url = "https://vnexpress.net/rss/the-thao.rss"
+        elif opt == 5:
+            url = "https://vnexpress.net/rss/khoa-hoc.rss"
+
+        feed = feedparser.parse(url)
+        feed_entries = feed.entries
+
+        if opt == 0:
+            result = {
+                "is_update": 0,
+                "see_more": "https://vnexpress.net/tin-tuc-24h",
+            }
+        elif opt == 1:
+            result = {
+                "is_update": opt,
+                "see_more": "https://vnexpress.net/tin-tuc-24h",
+            }
+        elif opt == 2:
+            result = {
+                "is_update": opt,
+                "see_more": "https://vnexpress.net/tin-nong",
+            }
+        elif opt == 3:
+            result = {
+                "is_update": opt,
+                "see_more": "https://vnexpress.net/giai-tri",
+            }
+        elif opt == 4:
+            result = {
+                "is_update": opt,
+                "see_more": "https://vnexpress.net/the-thao",
+            }
+        elif opt == 5:
+            result = {
+                "is_update": opt,
+                "see_more": "https://vnexpress.net/khoa-hoc",
+            }
+
+        i = 0
+        text = ""
+        for entry in feed_entries:
+            if i == 10:
+                break
+
+            article_title = entry.title
+            article_link = entry.link
+            # article_published_at = entry.published  # Time Formated
+            article_published_at_parsed = entry.published_parsed  # Time Object
+            content = split_content(entry.summary)
+
+            filename = "./image/cover" + str(i) + ".jpg"
+            img_url = content["l_img"]
+
+            if "none" in img_url:
+                article = {
+                    "title": article_title,
+                    "published_at": article_published_at_parsed,
+                    "cover_img": "./image/no_img.jpg",
+                    "desc": content["desc"],
+                    "link": article_link,
+                }
+
+            else:
+                img_data = requests.get(img_url).content
+                with open(filename, "wb") as handler:
+                    handler.write(img_data)
+
+                article = {
+                    "title": article_title,
+                    "published_at": article_published_at_parsed,
+                    "cover_img": filename,
+                    "desc": content["desc"],
+                    "link": article_link,
+                }
+
+            key = str(i)
+            result.update({key: article})
+            i += 1
+
+        return result
+
+    def search_news_complete(self, result):
+        if result["is_update"]:
+            self.ui.update_topic_content(self.MainWindow, result)
+            self.ui.update_topic_buttons(result["is_update"])
+        else:
+            self.ui.topic_button_1.setDisabled(True)
+            self.ui.setupUI_news_window(self.MainWindow, result)
 
 
 if __name__ == "__main__":

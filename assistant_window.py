@@ -969,7 +969,7 @@ class UI_Windows(object):
         layout_title_and_keyword.addWidget(title_wiki)
         layout_title_and_keyword.addWidget(label_keyword)
 
-        self.add_widget_space_horizontal(15, self.layout_logo_wiki_and_title)
+        self.add_widget_space_horizontal(35, self.layout_logo_wiki_and_title)
         self.layout_logo_wiki_and_title.addWidget(logo_wiki)
         self.add_widget_space_horizontal(15, self.layout_logo_wiki_and_title)
         self.layout_logo_wiki_and_title.addWidget(widgget_title_and_keyword)
@@ -982,10 +982,11 @@ class UI_Windows(object):
         self.widget_meaning_of_keyword.setObjectName("widget_meaning_of_keyword")
 
         self.layout_meaning_of_keyword = QVBoxLayout(self.widget_meaning_of_keyword)
-        self.layout_meaning_of_keyword.setContentsMargins(5, 15, 0, 15)
+        self.layout_meaning_of_keyword.setContentsMargins(10, 15, 0, 0)
 
         meaning_of_keyword = QPlainTextEdit(meaning)
         meaning_of_keyword.setObjectName("meaning_of_keyword")
+        meaning_of_keyword.setReadOnly(True)
 
         self.layout_meaning_of_keyword.addWidget(meaning_of_keyword)
         self.layout_wiki_window.addWidget(self.widget_meaning_of_keyword)

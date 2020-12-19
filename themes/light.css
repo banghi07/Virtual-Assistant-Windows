@@ -111,7 +111,7 @@ QLabel#label_error_details {
   padding: 10px;
 }
 
-/* Widget clock window */
+/* Widget Clock Window */
 QWidget#widget_clock_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -154,7 +154,7 @@ QLabel#label_date_in_clock_window {
   font: 20px;
 }
 
-/* Widget date window */
+/* Widget Date Window */
 QWidget#widget_date_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -197,7 +197,7 @@ QLabel#label_clock_in_date_window {
   font: 20px;
 }
 
-/* Widget loading window */
+/* Widget Loading Window */
 QWidget#widget_loading_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -252,7 +252,7 @@ QLabel#label_visible {
   font: 16px;
 }
 
-/* Widget news window */
+/* Widget News Window */
 QWidget#widget_news_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -458,4 +458,26 @@ QPushButton#button_see_more_news:hover {
   background-color: #f0eeee;
   border: none;
   padding: 10px auto 10px auto;
+}
+
+/* Widget Wikipedia Window */
+QWidget#widget_wiki_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#title_wiki {
+  font: 25px;
+  color: #e23046;
+}
+
+QLabel#label_keyword {
+  font: 20px;
+  color: #0099e5;
+}
+
+QPlainTextEdit#meaning_of_keyword {
+  font: 16px;
+  border-top: none;
+  border-bottom: none;
 }

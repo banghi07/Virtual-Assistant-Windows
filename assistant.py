@@ -1,16 +1,10 @@
 import ctypes
-import datetime
 import json
 import os
 import re
-import smtplib
 import sys
-import time
 import traceback
-import urllib
-import urllib.request as urllib2
 import webbrowser
-from time import strftime
 
 import feedparser
 import pyperclip
@@ -19,14 +13,12 @@ import speech_recognition as sr
 import wikipedia
 from fast_youtube_search import search_youtube
 from geopy.geocoders import Nominatim
-from googleapiclient.discovery import build
 from googletrans import Translator
 from gtts import gTTS, gTTSError
 from playsound import playsound
 from pynput import keyboard, mouse
 from pynput.keyboard import Controller, Key
 from PyQt5.QtWidgets import *
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
 from youtube_search import YoutubeSearch
 
 from assistant_threads import *
@@ -175,6 +167,8 @@ class Assistant:
                 delay.signals.args.connect(self.open_website_thread)
             else:
                 delay.signals.args.connect(self.open_application_thread)
+        elif "tra cứu" in text:
+            delay.signals.args.connect(self.lookup_wikipedia_thread)
 
         self.threadpool.start(delay)
 
@@ -603,6 +597,29 @@ class Assistant:
             text = "Phần mềm bạn yêu cầu chưa được cài đặt."
             self.ui.setupUI_error_window(self.MainWindow, url, text)
             self.speak_thread(text)
+
+    def lookup_wikipedia_thread(self, text):
+        reg_ex = re.search("tra cứu", text)
+        start = reg_ex.end() + 1
+        end = len(text)
+        keyword = text[start:end]
+
+        self.thread = Thread(self.lookup_wikipedia, keyword, "lookup_wikipedia")
+        self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.result.connect(self.lookup_wikipedia_complete)
+        self.threadpool.start(self.thread)
+
+    def lookup_wikipedia(self, keyword):
+        wikipedia.set_lang("vi")
+        result = {
+            "keyword": keyword.title(),
+            "meaning": wikipedia.summary(keyword),
+        }
+        return result
+
+    def lookup_wikipedia_complete(self, result):
+        self.ui.setupUI_wikipedia_window(self.MainWindow, result)
+        self.speak_thread("007")
 
 
 if __name__ == "__main__":

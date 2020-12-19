@@ -349,7 +349,8 @@ class UI_Windows(object):
         self.icon_time_zone.setScaledContents(True)
         self.icon_time_zone.setFixedSize(32, 32)
 
-        self.label_time_zone = QLabel(text)
+        s = "<b>" + text + "</b>"
+        self.label_time_zone = QLabel(s)
         self.label_time_zone.setObjectName("label_time_zone")
 
         self.layout_time_zone.addStretch()
@@ -621,7 +622,8 @@ class UI_Windows(object):
         self.icon_location_city_name.setScaledContents(True)
         self.icon_location_city_name.setPixmap(QPixmap("./icon/placeholder-32px.png"))
 
-        self.label_city_name = QLabel(text)
+        s = "<b>" + text + "</b>"
+        self.label_city_name = QLabel(s)
         self.label_city_name.setObjectName("label_city_name")
 
         self.add_widget_space_horizontal(30, self.layout_city_name)
@@ -653,7 +655,7 @@ class UI_Windows(object):
         label_temp.setObjectName("label_temp")
         label_temp.setTextFormat(Qt.RichText)
         label_temp.setText(s)
-        label_temp.setAlignment(Qt.AlignCenter)
+        # label_temp.setAlignment(Qt.AlignCenter)
         self.layout_weather_and_temp.addWidget(label_temp)
 
         self.layout_weather_and_temp.addStretch()
@@ -913,10 +915,85 @@ class UI_Windows(object):
         MainWindow.close()
         webbrowser.open(url)
 
+    def setupUI_wikipedia_window(self, MainWindow, result):
+        self.clear_UI(MainWindow)
+        MainWindow.setFixedSize(620, 520)
+
+        self.widget_wiki_window = QWidget()
+        self.widget_wiki_window.setObjectName("widget_wiki_window")
+
+        self.layout_wiki_window = QVBoxLayout(self.widget_wiki_window)
+        self.layout_wiki_window.setContentsMargins(0, 0, 0, 0)
+        self.layout_wiki_window.setSpacing(0)
+
+        self.widget_title_bar.setFixedSize(600, 35)
+        self.layout_wiki_window.addWidget(self.widget_title_bar)
+
+        self.display_logo_wiki_and_title(result["keyword"])
+        self.display_meaning_of_keyword(result["meaning"])
+
+        self.widget_bottom_bar.setFixedSize(600, 40)
+        self.layout_wiki_window.addWidget(self.widget_bottom_bar)
+        self.update_bottom_bar(1)
+
+        MainWindow.layout_container.addWidget(self.widget_wiki_window)
+        MainWindow.set_shadow_window()
+        MainWindow.show()
+        MainWindow.set_center_screen()
+
+    def display_logo_wiki_and_title(self, keyword):
+        self.widget_logo_wiki_and_title = QWidget()
+        self.widget_logo_wiki_and_title.setObjectName("widget_logo_wiki_and_title")
+
+        self.layout_logo_wiki_and_title = QHBoxLayout(self.widget_logo_wiki_and_title)
+        self.layout_logo_wiki_and_title.setContentsMargins(0, 10, 0, 0)
+
+        logo_wiki = QLabel()
+        logo_wiki.setPixmap(QPixmap("./icon/wikipedia-logo-128px.png"))
+        logo_wiki.setScaledContents(True)
+        logo_wiki.setFixedSize(100, 100)
+
+        widgget_title_and_keyword = QWidget()
+        layout_title_and_keyword = QVBoxLayout(widgget_title_and_keyword)
+        layout_title_and_keyword.setContentsMargins(0, 0, 0, 0)
+
+        title_wiki = QLabel("<b>Wikipedia</b>")
+        title_wiki.setObjectName("title_wiki")
+        title_wiki.setTextFormat(Qt.RichText)
+
+        s = "<b>" + keyword + "</b>"
+        label_keyword = QLabel(s)
+        label_keyword.setObjectName("label_keyword")
+        label_keyword.setTextFormat(Qt.RichText)
+
+        layout_title_and_keyword.addWidget(title_wiki)
+        layout_title_and_keyword.addWidget(label_keyword)
+
+        self.add_widget_space_horizontal(15, self.layout_logo_wiki_and_title)
+        self.layout_logo_wiki_and_title.addWidget(logo_wiki)
+        self.add_widget_space_horizontal(15, self.layout_logo_wiki_and_title)
+        self.layout_logo_wiki_and_title.addWidget(widgget_title_and_keyword)
+        self.layout_logo_wiki_and_title.addStretch()
+
+        self.layout_wiki_window.addWidget(self.widget_logo_wiki_and_title)
+
+    def display_meaning_of_keyword(self, meaning):
+        self.widget_meaning_of_keyword = QWidget()
+        self.widget_meaning_of_keyword.setObjectName("widget_meaning_of_keyword")
+
+        self.layout_meaning_of_keyword = QVBoxLayout(self.widget_meaning_of_keyword)
+        self.layout_meaning_of_keyword.setContentsMargins(5, 15, 0, 15)
+
+        meaning_of_keyword = QPlainTextEdit(meaning)
+        meaning_of_keyword.setObjectName("meaning_of_keyword")
+
+        self.layout_meaning_of_keyword.addWidget(meaning_of_keyword)
+        self.layout_wiki_window.addWidget(self.widget_meaning_of_keyword)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     MainWindow = Window()
     ui = UI_Windows()
-    ui.setupUI_news_window(MainWindow)
+    ui.setupUI_wikipedia_window(MainWindow)
     sys.exit(app.exec_())

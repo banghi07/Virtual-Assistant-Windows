@@ -240,65 +240,65 @@ class UI_Windows(object):
 
         self.layout_main_window.addWidget(self.widget_assistant_hint)
 
-    # * UI simple window
-    def setupUI_simple_window(self, MainWindow, url, text):
+    # * UI error window
+    def setupUI_error_window(self, MainWindow, url, text):
         self.clear_UI(MainWindow)
         MainWindow.setFixedSize(520, 470)
 
-        self.widget_simple_window = QWidget()
-        self.widget_simple_window.setObjectName("widget_simple_window")
+        self.widget_error_window = QWidget()
+        self.widget_error_window.setObjectName("widget_error_window")
+
+        self.layout_error_window = QVBoxLayout(self.widget_error_window)
+        self.layout_error_window.setContentsMargins(0, 0, 0, 0)
 
         self.widget_title_bar.setFixedSize(500, 35)
-        self.layout_simple_window = QVBoxLayout(self.widget_simple_window)
-        self.layout_simple_window.setContentsMargins(0, 0, 0, 0)
+        self.layout_error_window.addWidget(self.widget_title_bar)
 
-        self.layout_simple_window.addWidget(self.widget_title_bar)
-
-        self.display_icon_assistant_answer(url)
-        self.display_assistant_answer(text)
-        self.layout_simple_window.addStretch()
+        self.display_error_image(url)
+        self.display_error_details(text)
+        self.layout_error_window.addStretch()
 
         self.widget_bottom_bar.setFixedSize(500, 40)
-        self.layout_simple_window.addWidget(self.widget_bottom_bar)
+        self.layout_error_window.addWidget(self.widget_bottom_bar)
         self.update_bottom_bar(1)
 
-        MainWindow.layout_container.addWidget(self.widget_simple_window)
+        MainWindow.layout_container.addWidget(self.widget_error_window)
         MainWindow.set_shadow_window()
         MainWindow.show()
         MainWindow.set_center_screen()
 
-    def display_icon_assistant_answer(self, url):
-        self.widget_icon_answer = QWidget()
-        self.widget_icon_answer.setObjectName("widget_icon_assistant_answer")
+    def display_error_image(self, url):
+        self.widget_error_image = QWidget()
+        self.widget_error_image.setObjectName("widget_error_image")
 
-        self.layout_icon_answer = QHBoxLayout(self.widget_icon_answer)
-        self.layout_icon_answer.setContentsMargins(0, 0, 0, 0)
+        self.layout_error_image = QHBoxLayout(self.widget_error_image)
+        self.layout_error_image.setContentsMargins(0, 0, 0, 0)
 
-        self.label_icon_answer = QLabel()
-        self.label_icon_answer.setObjectName("label_icon_assistant_answer")
-        self.label_icon_answer.setPixmap(QPixmap(url))
-        self.label_icon_answer.setScaledContents(True)
-        self.label_icon_answer.setFixedSize(170, 170)
+        self.label_error_image = QLabel()
+        self.label_error_image.setObjectName("label_error_image")
+        self.label_error_image.setPixmap(QPixmap(url))
+        self.label_error_image.setScaledContents(True)
+        self.label_error_image.setFixedSize(170, 170)
 
-        self.layout_icon_answer.addWidget(self.label_icon_answer)
+        self.layout_error_image.addWidget(self.label_error_image)
 
-        self.layout_simple_window.addWidget(self.widget_icon_answer)
+        self.layout_error_window.addWidget(self.widget_error_image)
 
-    def display_assistant_answer(self, text):
-        self.widget_assistant_answer = QWidget()
-        self.widget_assistant_answer.setObjectName("widget_assistant_answer")
+    def display_error_details(self, text):
+        self.widget_error_details = QWidget()
+        self.widget_error_details.setObjectName("widget_error_details")
 
-        self.layout_assistant_answer = QHBoxLayout(self.widget_assistant_answer)
-        self.layout_assistant_answer.setContentsMargins(0, 0, 0, 0)
+        self.layout_error_details = QHBoxLayout(self.widget_error_details)
+        self.layout_error_details.setContentsMargins(0, 0, 0, 0)
 
-        self.label_assistant_answer = QLabel(text)
-        self.label_assistant_answer.setObjectName("label_assistant_answer")
+        self.label_error_details = QLabel(text)
+        self.label_error_details.setObjectName("label_error_details")
 
-        self.layout_assistant_answer.addStretch()
-        self.layout_assistant_answer.addWidget(self.label_assistant_answer)
-        self.layout_assistant_answer.addStretch()
+        self.layout_error_details.addStretch()
+        self.layout_error_details.addWidget(self.label_error_details)
+        self.layout_error_details.addStretch()
 
-        self.layout_simple_window.addWidget(self.widget_assistant_answer)
+        self.layout_error_window.addWidget(self.widget_error_details)
 
     def setupUI_clock_window(self, MainWindow, result):
         self.clear_UI(MainWindow)

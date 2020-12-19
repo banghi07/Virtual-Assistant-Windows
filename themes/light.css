@@ -94,17 +94,17 @@ QLabel#label_user_answer {
   margin-bottom: 2px;
 }
 
-/* Widget Simple Window */
-QWidget#widget_simple_window {
+/* Widget Error Window */
+QWidget#widget_error_window {
   background-color: #ffffff;
   border: 1px solid #595959;
 }
 
-QLabel#label_icon_assistant_answer {
+QLabel#label_error_image {
   padding: 10px;
 }
 
-QLabel#label_assistant_answer {
+QLabel#label_error_details {
   font: 16px;
   background-color: #e6e6e6;
   border-radius: 5px;

@@ -182,7 +182,7 @@ class Assistant:
     def didnt_hear(self):
         url = "./icon/mute-microphone-256px.png"
         text = "Xin lỗi tôi không nghe rõ bạn nói gì."
-        self.ui.setupUI_simple_window(self.MainWindow, url, text)
+        self.ui.setupUI_error_window(self.MainWindow, url, text)
         self.speak_thread("001")
 
     # * func_no2:
@@ -601,7 +601,7 @@ class Assistant:
         else:
             url = "./icon/error-256px.png"
             text = "Phần mềm bạn yêu cầu chưa được cài đặt."
-            self.ui.setupUI_simple_window(self.MainWindow, url, text)
+            self.ui.setupUI_error_window(self.MainWindow, url, text)
             self.speak_thread(text)
 
 

@@ -115,7 +115,7 @@ class Assistant:
 
     # * UI Button Connect
     def ui_button_connect(self):
-        self.ui.button_close.clicked.connect(self.close_window)
+        self.ui.button_close.clicked.connect(self.exit_application)
         self.ui.button_microphone.clicked.connect(self.initial_assistant)
         self.ui.topic_button_1.clicked.connect(lambda: self.search_news_thread(1))
         self.ui.topic_button_2.clicked.connect(lambda: self.search_news_thread(2))
@@ -123,15 +123,12 @@ class Assistant:
         self.ui.topic_button_4.clicked.connect(lambda: self.search_news_thread(4))
         self.ui.topic_button_5.clicked.connect(lambda: self.search_news_thread(5))
 
-    def close_window(self):
+    def exit_application(self):
         QCoreApplication.exit()
         self.thread.kill()
 
-    # * Initial Assistant
-    def initial_assistant(self):
-        self.ui.setupUI_main_window(self.MainWindow)
-        playsound("./audio/101_notification.wav", False)
-        self.get_text_from_audio_thread(self.user_request)
+    def close_window(self):
+        self.MainWindow.close()
 
     def get_location_from_ip(self):
         url = "https://ipinfo.io/"
@@ -145,6 +142,17 @@ class Assistant:
 
         result = {"city": city, "region": region, "lat": lat, "lon": lon}
         return result
+
+    def find_app(self, name, path):
+        for root, dirs, files in os.walk(path):
+            if name in files:
+                return os.path.join(root, name)
+
+    # * Initial Assistant
+    def initial_assistant(self):
+        self.ui.setupUI_main_window(self.MainWindow)
+        playsound("./audio/101_notification.wav", False)
+        self.get_text_from_audio_thread(self.user_request)
 
     # * User Request
     def user_request(self, text):
@@ -162,6 +170,11 @@ class Assistant:
             delay.signals.args.connect(self.what_weather_thread)
         elif "tin tức" in text:
             delay.signals.finished.connect(self.search_news_thread)
+        elif "mở" in text:
+            if "." in text:
+                delay.signals.args.connect(self.open_website_thread)
+            else:
+                delay.signals.args.connect(self.open_application_thread)
 
         self.threadpool.start(delay)
 
@@ -277,11 +290,7 @@ class Assistant:
         self.speak_thread(speech)
 
     # * func_no4:
-    def play_song_thread(self, args):
-        self.ui.update_bottom_bar()
-        self.ui.setupUI_loading_window(self.MainWindow, "Đang mở video....")
-
-        text = list(args)[0]
+    def play_song_thread(self, text):
         if "mở video" in text:
             reg_ex = re.search("mở video", text)
             start = reg_ex.end() + 1
@@ -297,24 +306,27 @@ class Assistant:
             if song_name == "":
                 song_name = "none"
 
+        self.ui.update_bottom_bar()
+        self.ui.setupUI_loading_window(self.MainWindow, "Đang mở video....")
+
         self.thread = Thread(self.play_song, song_name, "play_song")
         self.thread.signals.running.connect(self.update_thread_list)
         self.thread.signals.result.connect(self.play_song_complete)
         self.threadpool.start(self.thread)
 
-    def play_song(self, text):
-        result = search_youtube([text])
+    def play_song(self, song_name):
+        result = search_youtube([song_name])
         # result = YoutubeSearch(text, max_results=3).to_dict()
         url = "https://www.youtube.com/watch?v=" + result[0]["id"]
         # url = "https://www.youtube.com/" + result[0]["url_suffix"]
         webbrowser.open(url)
 
     def play_song_complete(self):
-        self.MainWindow.close()
+        self.thread = ThreadDelay(1)
+        self.thread.signals.finished.connect(self.close_window)
+        self.threadpool.start(self.thread)
 
-    def what_weather_thread(self, args):
-        text = list(args)[0]
-
+    def what_weather_thread(self, text):
         if "tỉnh" in text:
             reg_ex = re.search("tỉnh", text)
             start = reg_ex.end() + 1
@@ -432,53 +444,45 @@ class Assistant:
 
         if opt == 0:
             url = "https://vnexpress.net/rss/tin-moi-nhat.rss"
-        elif opt == 1:
-            url = "https://vnexpress.net/rss/tin-moi-nhat.rss"
-        elif opt == 2:
-            url = "https://vnexpress.net/rss/tin-noi-bat.rss"
-        elif opt == 3:
-            url = "https://vnexpress.net/rss/giai-tri.rss"
-        elif opt == 4:
-            url = "https://vnexpress.net/rss/the-thao.rss"
-        elif opt == 5:
-            url = "https://vnexpress.net/rss/khoa-hoc.rss"
-
-        feed = feedparser.parse(url)
-        feed_entries = feed.entries
-
-        if opt == 0:
             result = {
                 "is_update": 0,
                 "see_more": "https://vnexpress.net/tin-tuc-24h",
             }
         elif opt == 1:
+            url = "https://vnexpress.net/rss/tin-moi-nhat.rss"
             result = {
                 "is_update": opt,
                 "see_more": "https://vnexpress.net/tin-tuc-24h",
             }
         elif opt == 2:
+            url = "https://vnexpress.net/rss/tin-noi-bat.rss"
             result = {
                 "is_update": opt,
                 "see_more": "https://vnexpress.net/tin-nong",
             }
         elif opt == 3:
+            url = "https://vnexpress.net/rss/giai-tri.rss"
             result = {
                 "is_update": opt,
                 "see_more": "https://vnexpress.net/giai-tri",
             }
         elif opt == 4:
+            url = "https://vnexpress.net/rss/the-thao.rss"
             result = {
                 "is_update": opt,
                 "see_more": "https://vnexpress.net/the-thao",
             }
         elif opt == 5:
+            url = "https://vnexpress.net/rss/khoa-hoc.rss"
             result = {
                 "is_update": opt,
                 "see_more": "https://vnexpress.net/khoa-hoc",
             }
 
+        feed = feedparser.parse(url)
+        feed_entries = feed.entries
+
         i = 0
-        text = ""
         for entry in feed_entries:
             if i == 10:
                 break
@@ -527,6 +531,78 @@ class Assistant:
         else:
             self.ui.topic_button_1.setDisabled(True)
             self.ui.setupUI_news_window(self.MainWindow, result)
+
+    def open_website_thread(self, text):
+        self.ui.update_bottom_bar()
+        self.ui.setupUI_loading_window(self.MainWindow, "Đang mở website....")
+
+        self.thread = Thread(self.open_website, text, "open_website")
+        self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.result.connect(self.open_website_complete)
+        self.threadpool.start(self.thread)
+
+    def open_website(self, text):
+        reg_ex = re.search("mở (.+)", text)
+        if reg_ex:
+            domain = reg_ex.group(1)
+            url = "https://www." + domain
+            webbrowser.open(url)
+
+    def open_website_complete(self):
+        self.thread = ThreadDelay(1)
+        self.thread.signals.finished.connect(self.close_window)
+        self.threadpool.start(self.thread)
+
+    def open_application_thread(self, text):
+        if "edge" in text:
+            file_name = "msedge.exe"
+            full_name = "Microsoft Edge"
+        elif "chrome" in text:
+            file_name = "chrome.exe"
+            full_name = "Google Chrome"
+        elif "word" in text:
+            file_name = "WINWORD.EXE"
+            full_name = "Microsoft Word"
+        elif "excel" in text:
+            file_name = "EXCEL.EXE"
+            full_name = "Microsoft Excel"
+        elif "powerpoint" in text:
+            file_name = "POWERPNT.EXE"
+            full_name = "Microsoft PowerPoint"
+        else:
+            # self.search_default(text)
+            pass
+
+        self.ui.update_bottom_bar()
+        self.ui.setupUI_loading_window(self.MainWindow, "Đang mở phần mềm/ứng dụng....")
+
+        self.thread = Thread(
+            self.open_application, file_name, full_name, "open_application"
+        )
+        self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.result.connect(self.open_application_complete)
+        self.threadpool.start(self.thread)
+
+    def open_application(self, file_name, full_name):
+        path = self.find_app(file_name, "C:/")
+        if path:
+            os.startfile(path)
+            return True
+        else:
+            return False
+
+    def open_application_complete(self, result):
+        if result:
+            self.thread = ThreadDelay(1, "008")
+            self.thread.signals.finished.connect(self.close_window)
+            self.thread.signals.args.connect(self.speak_thread)
+            self.threadpool.start(self.thread)
+
+        else:
+            url = "./icon/mute-microphone-256px.png"
+            text = "Ứng dụng bạn yêu cầu chưa được cài đặt."
+            self.ui.setupUI_simple_window(self.MainWindow, url, text)
+            self.speak_thread(text)
 
 
 if __name__ == "__main__":

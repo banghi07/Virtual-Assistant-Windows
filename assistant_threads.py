@@ -98,4 +98,5 @@ class ThreadDelay(QRunnable):
     def run(self):
         time.sleep(self.time_delay)
         self.signals.finished.emit()
-        self.signals.args.emit(self.args)
+        if len(self.args) > 0:
+            self.signals.args.emit(*self.args)

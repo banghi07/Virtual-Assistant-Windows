@@ -599,8 +599,8 @@ class Assistant:
             self.threadpool.start(self.thread)
 
         else:
-            url = "./icon/mute-microphone-256px.png"
-            text = "Ứng dụng bạn yêu cầu chưa được cài đặt."
+            url = "./icon/error-256px.png"
+            text = "Phần mềm bạn yêu cầu chưa được cài đặt."
             self.ui.setupUI_simple_window(self.MainWindow, url, text)
             self.speak_thread(text)
 

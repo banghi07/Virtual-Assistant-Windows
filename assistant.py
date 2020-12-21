@@ -169,6 +169,8 @@ class Assistant:
                 delay.signals.args.connect(self.open_application_thread)
         elif "tra cứu" in text:
             delay.signals.args.connect(self.lookup_wikipedia_thread)
+        else:
+            delay.signals.args.connect(self.search_default_thread)
 
         self.threadpool.start(delay)
 
@@ -620,6 +622,55 @@ class Assistant:
     def lookup_wikipedia_complete(self, result):
         self.ui.setupUI_wikipedia_window(self.MainWindow, result)
         self.speak_thread("007")
+
+    def search_default_thread(self, text):
+        self.thread = Thread(self.search_default, text, "search_default")
+        self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.result.connect(self.search_default_complete)
+        self.threadpool.start(self.thread)
+
+    def search_default(self, text):
+        api_cse = "AIzaSyD79kNJykY2xrelsR8tE3QciUe83nOyYKw"
+        cx_cse = "efcdf7a6d77b621bc"
+        page = 1
+        fields = "searchInformation(formattedTotalResults,formattedSearchTime),items(title,formattedUrl,snippet,link)"
+
+        url_cse = "https://www.googleapis.com/customsearch/v1?key={}&cx={}&start={}&q={}&fields={}"
+        response = requests.get(
+            url_cse.format(api_cse, cx_cse, page, text, fields)
+        ).json()
+
+        result = {}
+        for i in range(10):
+            key = str(i)
+
+            values = {
+                "formatted_url": response["items"][i]["formattedUrl"],
+                "title": response["items"][i]["title"],
+                "snippet": str(response["items"][i]["snippet"]).strip("\n"),
+                "link": response["items"][i]["link"],
+            }
+            result.update({key: values})
+
+        result.update({"text": text})
+
+        about = "Khoảng {} kết quả ({} giây)\n\n".format(
+            response["searchInformation"]["formattedTotalResults"],
+            response["searchInformation"]["formattedSearchTime"],
+        )
+        result.update({"about": about})
+
+        see_more = "https://www.google.com/search?q={}".format(text)
+        result.update({"see_more": see_more})
+
+        speech = "Đây là kết quả tìm kiếm cho {}".format(text)
+        result.update({"speech": speech})
+
+        return result
+
+    def search_default_complete(self, result):
+        self.ui.setupUI_search_default_window(self.MainWindow, result)
+        self.speak_thread(result["speech"])
 
 
 if __name__ == "__main__":

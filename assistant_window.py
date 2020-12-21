@@ -199,12 +199,12 @@ class UI_Windows(object):
         listen_gif = QMovie(url_listen_gif)
         listen_gif.start()
 
-        self.label_listen_animated = QLabel()
-        self.label_listen_animated.setMovie(listen_gif)
-        self.label_listen_animated.setScaledContents(True)
-        self.label_listen_animated.setFixedSize(170, 170)
+        label_listen_animated = QLabel()
+        label_listen_animated.setMovie(listen_gif)
+        label_listen_animated.setScaledContents(True)
+        label_listen_animated.setFixedSize(170, 170)
 
-        self.layout_listen_animated.addWidget(self.label_listen_animated)
+        self.layout_listen_animated.addWidget(label_listen_animated)
 
         self.layout_main_window.addWidget(self.widget_listen_animated)
 
@@ -215,11 +215,11 @@ class UI_Windows(object):
         self.layout_assistant_ask = QHBoxLayout(self.widget_assistant_ask)
         self.layout_assistant_ask.setContentsMargins(0, 0, 0, 0)
 
-        self.label_assistant_ask = QLabel("Bạn có yêu cầu gì không?")
-        self.label_assistant_ask.setObjectName("label_assistant_ask")
+        label_assistant_ask = QLabel("Bạn có yêu cầu gì không?")
+        label_assistant_ask.setObjectName("label_assistant_ask")
 
         self.layout_assistant_ask.addStretch()
-        self.layout_assistant_ask.addWidget(self.label_assistant_ask)
+        self.layout_assistant_ask.addWidget(label_assistant_ask)
         self.layout_assistant_ask.addStretch()
 
         self.layout_main_window.addWidget(self.widget_assistant_ask)
@@ -231,11 +231,11 @@ class UI_Windows(object):
         self.layout_assistant_hint = QHBoxLayout(self.widget_assistant_hint)
         self.layout_assistant_hint.setContentsMargins(0, 0, 0, 0)
 
-        self.label_assistant_hint = QLabel('Thử gọi "Trợ giúp"')
-        self.label_assistant_hint.setObjectName("label_assistant_hint")
+        label_assistant_hint = QLabel('Thử gọi "Trợ giúp"')
+        label_assistant_hint.setObjectName("label_assistant_hint")
 
         self.layout_assistant_hint.addStretch()
-        self.layout_assistant_hint.addWidget(self.label_assistant_hint)
+        self.layout_assistant_hint.addWidget(label_assistant_hint)
         self.layout_assistant_hint.addStretch()
 
         self.layout_main_window.addWidget(self.widget_assistant_hint)
@@ -255,7 +255,9 @@ class UI_Windows(object):
         self.layout_error_window.addWidget(self.widget_title_bar)
 
         self.display_error_image(url)
+
         self.display_error_details(text)
+
         self.layout_error_window.addStretch()
 
         self.widget_bottom_bar.setFixedSize(500, 40)
@@ -274,13 +276,13 @@ class UI_Windows(object):
         self.layout_error_image = QHBoxLayout(self.widget_error_image)
         self.layout_error_image.setContentsMargins(0, 0, 0, 0)
 
-        self.label_error_image = QLabel()
-        self.label_error_image.setObjectName("label_error_image")
-        self.label_error_image.setPixmap(QPixmap(url))
-        self.label_error_image.setScaledContents(True)
-        self.label_error_image.setFixedSize(170, 170)
+        label_error_image = QLabel()
+        label_error_image.setObjectName("label_error_image")
+        label_error_image.setPixmap(QPixmap(url))
+        label_error_image.setScaledContents(True)
+        label_error_image.setFixedSize(170, 170)
 
-        self.layout_error_image.addWidget(self.label_error_image)
+        self.layout_error_image.addWidget(label_error_image)
 
         self.layout_error_window.addWidget(self.widget_error_image)
 
@@ -291,11 +293,11 @@ class UI_Windows(object):
         self.layout_error_details = QHBoxLayout(self.widget_error_details)
         self.layout_error_details.setContentsMargins(0, 0, 0, 0)
 
-        self.label_error_details = QLabel(text)
-        self.label_error_details.setObjectName("label_error_details")
+        label_error_details = QLabel(text)
+        label_error_details.setObjectName("label_error_details")
 
         self.layout_error_details.addStretch()
-        self.layout_error_details.addWidget(self.label_error_details)
+        self.layout_error_details.addWidget(label_error_details)
         self.layout_error_details.addStretch()
 
         self.layout_error_window.addWidget(self.widget_error_details)
@@ -312,19 +314,23 @@ class UI_Windows(object):
 
         self.widget_title_bar.setFixedSize(500, 35)
         self.layout_clock_window.addWidget(self.widget_title_bar)
+
         self.add_widget_space_vertical(50, self.layout_clock_window)
 
         s = result["zone_name"] + ", " + "UTC " + result["utc"]
         self.display_time_zone(s)
         self.layout_clock_window.addWidget(self.widget_time_zone)
+
         self.add_widget_space_vertical(30, self.layout_clock_window)
 
         self.display_clock(result["hour"], result["minute"], result["second"])
+
         self.add_widget_space_vertical(15, self.layout_clock_window)
 
         self.display_date_in_clock_window(
             result["day"], result["month"], result["year"]
         )
+
         self.layout_clock_window.addStretch()
 
         self.widget_bottom_bar.setFixedSize(500, 40)
@@ -343,19 +349,19 @@ class UI_Windows(object):
         self.layout_time_zone = QHBoxLayout(self.widget_time_zone)
         self.layout_time_zone.setContentsMargins(0, 0, 0, 0)
 
-        self.icon_time_zone = QLabel()
-        self.icon_time_zone.setObjectName("icon_time_zone")
-        self.icon_time_zone.setPixmap(QPixmap("./icon/time-zone-32px.png"))
-        self.icon_time_zone.setScaledContents(True)
-        self.icon_time_zone.setFixedSize(32, 32)
+        icon_time_zone = QLabel()
+        icon_time_zone.setObjectName("icon_time_zone")
+        icon_time_zone.setPixmap(QPixmap("./icon/time-zone-32px.png"))
+        icon_time_zone.setScaledContents(True)
+        icon_time_zone.setFixedSize(32, 32)
 
         s = "<b>" + text + "</b>"
-        self.label_time_zone = QLabel(s)
-        self.label_time_zone.setObjectName("label_time_zone")
+        label_time_zone = QLabel(s)
+        label_time_zone.setObjectName("label_time_zone")
 
         self.layout_time_zone.addStretch()
-        self.layout_time_zone.addWidget(self.icon_time_zone)
-        self.layout_time_zone.addWidget(self.label_time_zone)
+        self.layout_time_zone.addWidget(icon_time_zone)
+        self.layout_time_zone.addWidget(label_time_zone)
         self.layout_time_zone.addStretch()
 
     def display_clock(self, h, m, s):
@@ -365,27 +371,27 @@ class UI_Windows(object):
         self.layout_clock = QHBoxLayout(self.widget_clock)
         self.layout_clock.setContentsMargins(0, 0, 0, 0)
 
-        self.label_hour = QLabel(h)
-        self.label_hour.setObjectName("label_hour")
+        label_hour = QLabel(h)
+        label_hour.setObjectName("label_hour")
 
-        self.label_colon = QLabel(":")
-        self.label_colon.setObjectName("label_colon")
+        label_colon = QLabel(":")
+        label_colon.setObjectName("label_colon")
 
-        self.label_minute = QLabel(m)
-        self.label_minute.setObjectName("label_minute")
+        label_minute = QLabel(m)
+        label_minute.setObjectName("label_minute")
 
-        self.label_colon2 = QLabel(":")
-        self.label_colon2.setObjectName("label_colon2")
+        label_colon2 = QLabel(":")
+        label_colon2.setObjectName("label_colon2")
 
-        self.label_second = QLabel(s)
-        self.label_second.setObjectName("label_second")
+        label_second = QLabel(s)
+        label_second.setObjectName("label_second")
 
         self.layout_clock.addStretch()
-        self.layout_clock.addWidget(self.label_hour)
-        self.layout_clock.addWidget(self.label_colon)
-        self.layout_clock.addWidget(self.label_minute)
-        self.layout_clock.addWidget(self.label_colon2)
-        self.layout_clock.addWidget(self.label_second)
+        self.layout_clock.addWidget(label_hour)
+        self.layout_clock.addWidget(label_colon)
+        self.layout_clock.addWidget(label_minute)
+        self.layout_clock.addWidget(label_colon2)
+        self.layout_clock.addWidget(label_second)
         self.layout_clock.addStretch()
 
         self.layout_clock_window.addWidget(self.widget_clock)
@@ -397,20 +403,20 @@ class UI_Windows(object):
         self.layout_date_in_clock_window = QHBoxLayout(self.widget_date_in_clock_window)
         self.layout_date_in_clock_window.setContentsMargins(0, 0, 0, 0)
 
-        self.icon_date = QLabel()
-        self.icon_date.setObjectName("icon_date")
-        self.icon_date.setPixmap(QPixmap("./icon/calendar-32px.png"))
-        self.icon_date.setScaledContents(True)
-        self.icon_date.setFixedSize(25, 25)
+        icon_date = QLabel()
+        icon_date.setObjectName("icon_date")
+        icon_date.setPixmap(QPixmap("./icon/calendar-32px.png"))
+        icon_date.setScaledContents(True)
+        icon_date.setFixedSize(25, 25)
 
         date = d + "/" + m + "/" + y
 
-        self.label_date_in_clock_window = QLabel(date)
-        self.label_date_in_clock_window.setObjectName("label_date_in_clock_window")
+        label_date_in_clock_window = QLabel(date)
+        label_date_in_clock_window.setObjectName("label_date_in_clock_window")
 
         self.layout_date_in_clock_window.addStretch()
-        self.layout_date_in_clock_window.addWidget(self.icon_date)
-        self.layout_date_in_clock_window.addWidget(self.label_date_in_clock_window)
+        self.layout_date_in_clock_window.addWidget(icon_date)
+        self.layout_date_in_clock_window.addWidget(label_date_in_clock_window)
         self.layout_date_in_clock_window.addStretch()
 
         self.layout_clock_window.addWidget(self.widget_date_in_clock_window)
@@ -427,19 +433,23 @@ class UI_Windows(object):
 
         self.widget_title_bar.setFixedSize(500, 35)
         self.layout_date_window.addWidget(self.widget_title_bar)
+
         self.add_widget_space_vertical(50, self.layout_date_window)
 
         s = result["zone_name"] + ", " + "UTC " + result["utc"]
         self.display_time_zone(s)
         self.layout_date_window.addWidget(self.widget_time_zone)
+
         self.add_widget_space_vertical(30, self.layout_date_window)
 
         self.display_date(result["day"], result["month"], result["year"])
+
         self.add_widget_space_vertical(15, self.layout_date_window)
 
         self.display_clock_in_date_window(
             result["hour"], result["minute"], result["second"]
         )
+
         self.layout_date_window.addStretch()
 
         self.widget_bottom_bar.setFixedSize(500, 40)
@@ -458,27 +468,27 @@ class UI_Windows(object):
         self.layout_date = QHBoxLayout(self.widget_date)
         self.layout_date.setContentsMargins(0, 0, 0, 0)
 
-        self.label_day = QLabel(d)
-        self.label_day.setObjectName("label_day")
+        label_day = QLabel(d)
+        label_day.setObjectName("label_day")
 
-        self.label_slash = QLabel("/")
-        self.label_slash.setObjectName("label_slash")
+        label_slash = QLabel("/")
+        label_slash.setObjectName("label_slash")
 
-        self.label_month = QLabel(m)
-        self.label_month.setObjectName("label_month")
+        label_month = QLabel(m)
+        label_month.setObjectName("label_month")
 
-        self.label_slash2 = QLabel("/")
-        self.label_slash2.setObjectName("label_slash2")
+        label_slash2 = QLabel("/")
+        label_slash2.setObjectName("label_slash2")
 
-        self.label_year = QLabel(y)
-        self.label_year.setObjectName("label_year")
+        label_year = QLabel(y)
+        label_year.setObjectName("label_year")
 
         self.layout_date.addStretch()
-        self.layout_date.addWidget(self.label_day)
-        self.layout_date.addWidget(self.label_slash)
-        self.layout_date.addWidget(self.label_month)
-        self.layout_date.addWidget(self.label_slash2)
-        self.layout_date.addWidget(self.label_year)
+        self.layout_date.addWidget(label_day)
+        self.layout_date.addWidget(label_slash)
+        self.layout_date.addWidget(label_month)
+        self.layout_date.addWidget(label_slash2)
+        self.layout_date.addWidget(label_year)
         self.layout_date.addStretch()
 
         self.layout_date_window.addWidget(self.widget_date)
@@ -490,20 +500,20 @@ class UI_Windows(object):
         self.layout_clock_in_date_window = QHBoxLayout(self.widget_clock_in_date_window)
         self.layout_clock_in_date_window.setContentsMargins(0, 0, 0, 0)
 
-        self.icon_clock = QLabel()
-        self.icon_clock.setObjectName("icon_clock")
-        self.icon_clock.setPixmap(QPixmap("./icon/clock-32px.png"))
-        self.icon_clock.setScaledContents(True)
-        self.icon_clock.setFixedSize(25, 25)
+        icon_clock = QLabel()
+        icon_clock.setObjectName("icon_clock")
+        icon_clock.setPixmap(QPixmap("./icon/clock-32px.png"))
+        icon_clock.setScaledContents(True)
+        icon_clock.setFixedSize(25, 25)
 
         clock = h + ":" + m + ":" + s
 
-        self.label_clock_in_date_window = QLabel(clock)
-        self.label_clock_in_date_window.setObjectName("label_clock_in_date_window")
+        label_clock_in_date_window = QLabel(clock)
+        label_clock_in_date_window.setObjectName("label_clock_in_date_window")
 
         self.layout_clock_in_date_window.addStretch()
-        self.layout_clock_in_date_window.addWidget(self.icon_clock)
-        self.layout_clock_in_date_window.addWidget(self.label_clock_in_date_window)
+        self.layout_clock_in_date_window.addWidget(icon_clock)
+        self.layout_clock_in_date_window.addWidget(label_clock_in_date_window)
         self.layout_clock_in_date_window.addStretch()
 
         self.layout_date_window.addWidget(self.widget_clock_in_date_window)
@@ -515,10 +525,10 @@ class UI_Windows(object):
         self.widget_loading_window = QWidget()
         self.widget_loading_window.setObjectName("widget_loading_window")
 
-        self.widget_title_bar.setFixedSize(500, 35)
         self.layout_loading_window = QVBoxLayout(self.widget_loading_window)
         self.layout_loading_window.setContentsMargins(0, 0, 0, 0)
 
+        self.widget_title_bar.setFixedSize(500, 35)
         self.layout_loading_window.addWidget(self.widget_title_bar)
 
         self.display_loading_animated()
@@ -546,12 +556,12 @@ class UI_Windows(object):
         loading_gif = QMovie(url_loading_gif)
         loading_gif.start()
 
-        self.label_loading_animated = QLabel()
-        self.label_loading_animated.setMovie(loading_gif)
-        self.label_loading_animated.setScaledContents(True)
-        self.label_loading_animated.setFixedSize(170, 170)
+        label_loading_animated = QLabel()
+        label_loading_animated.setMovie(loading_gif)
+        label_loading_animated.setScaledContents(True)
+        label_loading_animated.setFixedSize(170, 170)
 
-        self.layout_loading_animated.addWidget(self.label_loading_animated)
+        self.layout_loading_animated.addWidget(label_loading_animated)
 
         self.layout_loading_window.addWidget(self.widget_loading_animated)
 
@@ -562,11 +572,11 @@ class UI_Windows(object):
         self.layout_assistant_loading = QHBoxLayout(self.widget_assistant_loading)
         self.layout_assistant_loading.setContentsMargins(0, 0, 0, 0)
 
-        self.label_assistant_loading = QLabel(text)
-        self.label_assistant_loading.setObjectName("label_assistant_loading")
+        label_assistant_loading = QLabel(text)
+        label_assistant_loading.setObjectName("label_assistant_loading")
 
         self.layout_assistant_loading.addStretch()
-        self.layout_assistant_loading.addWidget(self.label_assistant_loading)
+        self.layout_assistant_loading.addWidget(label_assistant_loading)
         self.layout_assistant_loading.addStretch()
 
         self.layout_loading_window.addWidget(self.widget_assistant_loading)
@@ -585,7 +595,6 @@ class UI_Windows(object):
         self.layout_weather_window.addWidget(self.widget_title_bar)
 
         self.display_city_name(result["city"])
-        self.layout_weather_window.addWidget(self.widget_city_name)
 
         self.add_widget_space_vertical(15, self.layout_weather_window)
 
@@ -598,6 +607,7 @@ class UI_Windows(object):
         self.add_widget_space_vertical(10, self.layout_weather_window)
 
         self.display_weather_details(result)
+
         self.layout_weather_window.addStretch()
 
         self.widget_bottom_bar.setFixedSize(550, 40)
@@ -616,20 +626,22 @@ class UI_Windows(object):
         self.layout_city_name = QHBoxLayout(self.widget_city_name)
         self.layout_city_name.setContentsMargins(0, 0, 0, 0)
 
-        self.icon_location_city_name = QLabel()
-        self.icon_location_city_name.setObjectName("icon_location_city_name")
-        self.icon_location_city_name.setFixedSize(23, 23)
-        self.icon_location_city_name.setScaledContents(True)
-        self.icon_location_city_name.setPixmap(QPixmap("./icon/placeholder-32px.png"))
+        icon_location_city_name = QLabel()
+        icon_location_city_name.setObjectName("icon_location_city_name")
+        icon_location_city_name.setFixedSize(23, 23)
+        icon_location_city_name.setScaledContents(True)
+        icon_location_city_name.setPixmap(QPixmap("./icon/placeholder-32px.png"))
 
         s = "<b>" + text + "</b>"
-        self.label_city_name = QLabel(s)
-        self.label_city_name.setObjectName("label_city_name")
+        label_city_name = QLabel(s)
+        label_city_name.setObjectName("label_city_name")
 
         self.add_widget_space_horizontal(30, self.layout_city_name)
-        self.layout_city_name.addWidget(self.icon_location_city_name)
-        self.layout_city_name.addWidget(self.label_city_name)
+        self.layout_city_name.addWidget(icon_location_city_name)
+        self.layout_city_name.addWidget(label_city_name)
         self.layout_city_name.addStretch()
+
+        self.layout_weather_window.addWidget(self.widget_city_name)
 
     def display_icon_weather_and_temp(self, icon, temp):
         self.widget_weather_and_temp = QWidget()
@@ -852,7 +864,7 @@ class UI_Windows(object):
         button_see_more_news = QPushButton("Xem thêm nhiều tin tức khác cùng chủ đề...")
         button_see_more_news.setObjectName("button_see_more_news")
         button_see_more_news.clicked.connect(
-            lambda: self.open_url_to_read_more(MainWindow, result["see_more"])
+            lambda: self.open_url_from_button(MainWindow, result["see_more"])
         )
         self.layout_scroll_area_news_content.addWidget(button_see_more_news)
 
@@ -895,7 +907,7 @@ class UI_Windows(object):
         button_read_more.setObjectName("button_read_more")
         button_read_more.setFixedSize(85, 27)
         button_read_more.clicked.connect(
-            lambda: self.open_url_to_read_more(MainWindow, article["link"])
+            lambda: self.open_url_from_button(MainWindow, article["link"])
         )
 
         layout_widget_contain_button.addStretch()
@@ -911,7 +923,7 @@ class UI_Windows(object):
 
         self.layout_scroll_area_news_content.addWidget(widget_news)
 
-    def open_url_to_read_more(self, MainWindow, url):
+    def open_url_from_button(self, MainWindow, url):
         MainWindow.close()
         webbrowser.open(url)
 
@@ -930,6 +942,7 @@ class UI_Windows(object):
         self.layout_wiki_window.addWidget(self.widget_title_bar)
 
         self.display_logo_wiki_and_title(result["keyword"])
+
         self.display_meaning_of_keyword(result["meaning"])
 
         self.widget_bottom_bar.setFixedSize(600, 40)
@@ -991,10 +1004,168 @@ class UI_Windows(object):
         self.layout_meaning_of_keyword.addWidget(meaning_of_keyword)
         self.layout_wiki_window.addWidget(self.widget_meaning_of_keyword)
 
+    def setupUI_search_default_window(self, MainWindow, result):
+        self.clear_UI(MainWindow)
+        MainWindow.setFixedSize(670, 620)
+
+        self.widget_search_default_window = QWidget()
+        self.widget_search_default_window.setObjectName("widget_search_default_window")
+
+        self.layout_search_default_window = QVBoxLayout(
+            self.widget_search_default_window
+        )
+        self.layout_search_default_window.setContentsMargins(0, 0, 0, 0)
+        self.layout_search_default_window.setSpacing(0)
+
+        self.widget_title_bar.setFixedSize(650, 35)
+        self.layout_search_default_window.addWidget(self.widget_title_bar)
+
+        self.display_title_search_default(result)
+
+        self.display_result_content(MainWindow, result)
+
+        self.widget_bottom_bar.setFixedSize(650, 40)
+        self.layout_search_default_window.addWidget(self.widget_bottom_bar)
+        self.update_bottom_bar(1)
+
+        MainWindow.layout_container.addWidget(self.widget_search_default_window)
+        MainWindow.set_shadow_window()
+        MainWindow.show()
+        MainWindow.set_center_screen()
+
+    def display_title_search_default(self, result):
+        self.widget_title_search_default = QWidget()
+        self.widget_title_search_default.setObjectName("widget_title_search_default")
+        self.widget_title_search_default.setFixedHeight(110)
+
+        self.layout_title_search_default = QHBoxLayout(self.widget_title_search_default)
+        self.layout_title_search_default.setContentsMargins(0, 0, 0, 10)
+        self.layout_title_search_default.setSpacing(0)
+
+        logo_google = QLabel()
+        logo_google.setPixmap(QPixmap("./icon/search-gg-128px.png"))
+        logo_google.setScaledContents(True)
+        logo_google.setFixedSize(90, 90)
+
+        widget_search_box_and_about = QWidget()
+        layout_search_box_and_about = QVBoxLayout(widget_search_box_and_about)
+        layout_search_box_and_about.setContentsMargins(0, 0, 0, 0)
+        layout_search_box_and_about.setSpacing(0)
+
+        widget_search_box = QWidget()
+        layout_search_box = QHBoxLayout(widget_search_box)
+        layout_search_box.setContentsMargins(0, 0, 0, 0)
+        layout_search_box.setSpacing(0)
+
+        search_box = QLineEdit(result["text"])
+        search_box.setObjectName("search_box")
+        search_box.setReadOnly(True)
+        search_box.setFixedWidth(350)
+        search_box.setFixedHeight(35)
+
+        icon_search_magnifying = QPushButton()
+        icon_search_magnifying.setObjectName("icon_search_magnifying")
+        icon_search_magnifying.setIcon(
+            QIcon("./icon/searching-magnifying-glass-32px.png")
+        )
+        icon_search_magnifying.setFixedSize(35, 35)
+
+        layout_search_box.addWidget(search_box)
+        layout_search_box.addWidget(icon_search_magnifying)
+        layout_search_box.addStretch()
+
+        label_about_of_result = QLabel(result["about"])
+        label_about_of_result.setObjectName("label_about_of_result")
+
+        self.add_widget_space_vertical(13, layout_search_box_and_about)
+        layout_search_box_and_about.addWidget(widget_search_box)
+        self.add_widget_space_vertical(2, layout_search_box_and_about)
+        layout_search_box_and_about.addWidget(label_about_of_result)
+
+        self.add_widget_space_horizontal(40, self.layout_title_search_default)
+        self.layout_title_search_default.addWidget(logo_google)
+        self.add_widget_space_horizontal(20, self.layout_title_search_default)
+        self.layout_title_search_default.addWidget(widget_search_box_and_about)
+
+        self.layout_search_default_window.addWidget(self.widget_title_search_default)
+
+    def display_result_content(self, MainWindow, result):
+        self.scroll_area_result = QScrollArea()
+        self.scroll_area_result.setObjectName("scroll_area_result")
+
+        self.scroll_area_result_content = QWidget()
+        self.scroll_area_result_content.setObjectName("scroll_area_result_content")
+
+        self.layout_scroll_area_result_content = QVBoxLayout(
+            self.scroll_area_result_content
+        )
+        self.layout_scroll_area_result_content.setContentsMargins(10, 10, 10, 10)
+        self.layout_scroll_area_result_content.setSpacing(10)
+
+        self.widget_result_container = QWidget()
+        self.widget_result_container.setObjectName("widget_result_container")
+        self.widget_result_container.setFixedWidth(611)
+
+        self.layout_result_container = QVBoxLayout(self.widget_result_container)
+        self.layout_result_container.setContentsMargins(10, 10, 10, 10)
+        self.layout_result_container.setSpacing(25)
+
+        for i in range(10):
+            self.display_result_widget(MainWindow, result[str(i)])
+
+        button_see_more_result = QPushButton("Xem thêm các kết quả khác...")
+        button_see_more_result.setObjectName("button_see_more_result")
+        button_see_more_result.clicked.connect(
+            lambda: self.open_url_from_button(MainWindow, result["see_more"])
+        )
+
+        self.layout_result_container.addWidget(button_see_more_result)
+
+        self.layout_scroll_area_result_content.addWidget(self.widget_result_container)
+
+        self.scroll_area_result.setWidget(self.scroll_area_result_content)
+
+        self.layout_search_default_window.addWidget(self.scroll_area_result)
+
+    def display_result_widget(self, MainWindow, result):
+        widget_result = QWidget()
+        layout_result = QVBoxLayout(widget_result)
+        layout_result.setContentsMargins(0, 0, 0, 0)
+        layout_result.setSpacing(5)
+
+        label_link_result = QLabel(result["formatted_url"])
+        label_link_result.setObjectName("label_link_result")
+
+        button_title_result = QPushButton(result["title"])
+        button_title_result.setObjectName("button_title_result")
+        button_title_result.clicked.connect(
+            lambda: self.open_url_from_button(MainWindow, result["link"])
+        )
+
+        widget_snippet = QWidget()
+        layout_snippet = QVBoxLayout(widget_snippet)
+        layout_snippet.setContentsMargins(0, 0, 0, 0)
+
+        label_snippet_result = QLabel(result["snippet"])
+        label_snippet_result.setObjectName("label_snippet_result")
+        label_snippet_result.setWordWrap(True)
+        label_snippet_result.adjustSize()
+
+        widget_snippet.setFixedHeight(label_snippet_result.height())
+        layout_snippet.addWidget(label_snippet_result)
+        layout_snippet.addStretch()
+
+        layout_result.addWidget(label_link_result)
+        layout_result.addWidget(button_title_result)
+        layout_result.addWidget(widget_snippet)
+        layout_result.addStretch()
+
+        self.layout_result_container.addWidget(widget_result)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     MainWindow = Window()
     ui = UI_Windows()
-    ui.setupUI_wikipedia_window(MainWindow)
+    ui.setupUI_search_default_window(MainWindow)
     sys.exit(app.exec_())

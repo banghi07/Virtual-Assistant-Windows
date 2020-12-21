@@ -429,7 +429,7 @@ QWidget#scroll_area_news_content {
 }
 
 QWidget#widget_news {
-  background-color: #f0eeee;
+  background-color: #f3f3f3;
 }
 
 QLabel#label_title_news {
@@ -480,4 +480,90 @@ QPlainTextEdit#meaning_of_keyword {
   font: 16px;
   border-top: none;
   border-bottom: none;
+}
+
+/* Widget Search Default Window */
+QWidget#widget_search_default_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLineEdit#search_box {
+  font: 16px;
+  padding: 0px 15px 0px 15px;
+  border: 1px solid black;
+  border-right: none;
+  border-top-left-radius: 17px;
+  border-bottom-left-radius: 17px;
+}
+
+QPushButton#icon_search_magnifying {
+  border: 1px solid black;
+  border-left: none;
+  border-top-right-radius: 17;
+  border-bottom-right-radius: 17;
+}
+
+QLabel#label_about_of_result {
+  font: 14px;
+  padding-left: 15px;
+}
+
+QScrollArea#scroll_area_result {
+  border-bottom: none;
+  border-top: none;
+}
+
+QWidget#scroll_area_result_content {
+  background-color: white;
+}
+
+QLabel#label_link_result {
+  font: 14px;
+}
+
+QPushButton#button_title_result {
+  font: 16px;
+  color: #1875e5;
+  font-weight: bold;
+  text-align: left;
+  border: none;
+}
+
+QPushButton#button_title_result:hover {
+  font: 16px;
+  color: #1875e5;
+  font-weight: bold;
+  text-align: left;
+  text-decoration: underline;
+  border: none;
+}
+
+QPushButton#button_title_result:pressed {
+  font: 16px;
+  color: #c5523f;
+  font-weight: bold;
+  text-align: left;
+  text-decoration: underline;
+  border: none;
+}
+
+QLabel#label_snippet_result {
+  font: 15px;
+}
+
+QPushButton#button_see_more_result {
+  font: 14px;
+  color: rgb(110, 110, 110);
+  background-color: #f0eeee;
+  border: none;
+  padding: 10px auto 10px auto;
+}
+
+QPushButton#button_see_more_result:hover {
+  font: 14px;
+  color: #e23046;
+  background-color: #f0eeee;
+  border: none;
+  padding: 10px auto 10px auto;
 }

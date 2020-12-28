@@ -23,21 +23,33 @@ from youtube_search import YoutubeSearch
 
 from assistant_threads import *
 from assistant_window import *
+from google_trans_new import google_translator
+from assistant_sys_tray_icon import SystemTrayIcon
 
 
 class Assistant:
     def __init__(self):
         app = QApplication(sys.argv)
+        app.setQuitOnLastWindowClosed(False)
 
         self.threadpool = QThreadPool()
         self.thread_list = []
 
+        self.w = QWidget()
+        self.tray_icon = SystemTrayIcon(self.w, self)
+        self.tray_icon.activated.connect(self.activate)
+
         self.MainWindow = Window()
+        self.FormTrans = Window(1)
         self.ui = UI_Windows()
         self.ui_button_connect()
         self.initial_assistant()
 
         sys.exit(app.exec_())
+
+    def activate(self, reason):
+        if reason == QSystemTrayIcon.Trigger:
+            self.initial_assistant()
 
     def update_thread_list(self, text, status):
         if status:
@@ -116,7 +128,7 @@ class Assistant:
         self.ui.topic_button_5.clicked.connect(lambda: self.search_news_thread(5))
 
     def exit_application(self):
-        QCoreApplication.exit()
+        self.MainWindow.close()
         self.thread.kill()
 
     def close_window(self):
@@ -169,6 +181,8 @@ class Assistant:
                 delay.signals.args.connect(self.open_application_thread)
         elif "tra cứu" in text:
             delay.signals.args.connect(self.lookup_wikipedia_thread)
+        elif "từ điển" in text:
+            delay.signals.finished.connect(self.translation_thread)
         else:
             delay.signals.args.connect(self.search_default_thread)
 
@@ -178,7 +192,7 @@ class Assistant:
     def didnt_hear(self):
         url = "./icon/mute-microphone-256px.png"
         text = "Xin lỗi tôi không nghe rõ bạn nói gì."
-        self.ui.setupUI_error_window(self.MainWindow, url, text)
+        self.ui.setupUI_response_window(self.MainWindow, url, text)
         self.speak_thread("001")
 
     # * func_no2:
@@ -566,18 +580,23 @@ class Assistant:
             file_name = "POWERPNT.EXE"
             full_name = "Microsoft PowerPoint"
         else:
-            # self.search_default(text)
-            pass
+            file_name = ""
+            full_name = ""
 
-        self.ui.update_bottom_bar()
-        self.ui.setupUI_loading_window(self.MainWindow, "Đang mở phần mềm/ứng dụng....")
+        if file_name != "" and full_name != "":
+            self.ui.update_bottom_bar()
+            self.ui.setupUI_loading_window(
+                self.MainWindow, "Đang mở phần mềm/ứng dụng...."
+            )
 
-        self.thread = Thread(
-            self.open_application, file_name, full_name, "open_application"
-        )
-        self.thread.signals.running.connect(self.update_thread_list)
-        self.thread.signals.result.connect(self.open_application_complete)
-        self.threadpool.start(self.thread)
+            self.thread = Thread(
+                self.open_application, file_name, full_name, "open_application"
+            )
+            self.thread.signals.running.connect(self.update_thread_list)
+            self.thread.signals.result.connect(self.open_application_complete)
+            self.threadpool.start(self.thread)
+        else:
+            self.search_default_thread(text)
 
     def open_application(self, file_name, full_name):
         path = self.find_app(file_name, "C:/")
@@ -597,7 +616,7 @@ class Assistant:
         else:
             url = "./icon/error-256px.png"
             text = "Phần mềm bạn yêu cầu chưa được cài đặt."
-            self.ui.setupUI_error_window(self.MainWindow, url, text)
+            self.ui.setupUI_response_window(self.MainWindow, url, text)
             self.speak_thread(text)
 
     def lookup_wikipedia_thread(self, text):
@@ -671,6 +690,80 @@ class Assistant:
     def search_default_complete(self, result):
         self.ui.setupUI_search_default_window(self.MainWindow, result)
         self.speak_thread(result["speech"])
+
+    def translation_thread(self):
+        url = "./icon/select-256px.png"
+        text = "Chọn từ hoặc câu cần dịch."
+        self.ui.setupUI_response_window(self.MainWindow, url, text, 1)
+        self.speak_thread(text)
+
+        self.trans_thread = ThreadTrans(self.translation, "translation")
+        self.trans_thread.signals.running.connect(self.update_thread_list)
+        self.trans_thread.signals.result.connect(self.translation_complete)
+        self.threadpool.start(self.trans_thread)
+
+        self.tray_icon.update_translation_action(1)
+
+    def translation(self):
+        keyboard = Controller()
+        translator = google_translator()
+        self.chain = []
+        result = {
+            "error": 2,
+        }
+
+        def on_move(x, y):
+            self.chain.append(2)
+
+        def on_click(x, y, button, pressed):
+            if pressed:
+                self.chain.append(1)
+            else:
+                self.chain.append(3)
+                self.cursor_position = QPoint(x, y)
+                return False
+
+        with mouse.Listener(on_move=on_move, on_click=on_click) as mouseListener:
+            mouseListener.join()
+
+        if self.chain[-2] != 1:
+            keyboard.press(Key.ctrl)
+            keyboard.press("c")
+            keyboard.release(Key.ctrl)
+            keyboard.release("c")
+            time.sleep(0.05)
+
+            str_from_clipboard = pyperclip.paste()
+            pyperclip.copy("")
+
+            if str_from_clipboard != "":
+                try:
+                    dest = translator.translate(str_from_clipboard, lang_tgt="vi")
+                    detect_lang = translator.detect(str_from_clipboard)
+                except:
+                    result = {
+                        "error": 1,
+                        "text": "Lỗi! Vui lòng thử lại lần nữa.",
+                        "cursor_pos": self.cursor_position,
+                    }
+                else:
+                    result = {
+                        "error": 0,
+                        "detect": str(detect_lang[1]).title(),
+                        "src": str_from_clipboard,
+                        "dest": dest,
+                        "cursor_pos": self.cursor_position,
+                    }
+        return result
+
+    def translation_complete(self, result):
+        if result["error"] == 2:
+            pass
+        else:
+            self.ui.setupUI_trans_window(self.FormTrans, result)
+
+    def exit_dict(self):
+        self.trans_thread.kill()
 
 
 if __name__ == "__main__":

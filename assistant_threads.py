@@ -50,12 +50,12 @@ class Thread(QRunnable):
         self.is_kill = True
 
 
-class ThreadDSignals(QObject):
+class ThreadTransSignals(QObject):
     running = pyqtSignal(str, int)
     result = pyqtSignal(object)
 
 
-class ThreadD(QRunnable):
+class ThreadTrans(QRunnable):
     def __init__(self, fn, *args, **kwargs):
         super().__init__()
         self.fn = fn
@@ -63,20 +63,22 @@ class ThreadD(QRunnable):
         self.kwargs = kwargs
         self.is_kill = False
         self.thread_name = list(self.args)[-1]
-        self.signals = ThreadDSignals()
+        self.signals = ThreadTransSignals()
 
     @pyqtSlot()
     def run(self):
         l = list(self.args)
         l.pop()
         t = tuple(l)
+
         while True:
-            if self.is_kill:
-                break
             self.signals.running.emit(self.thread_name, 1)
             result = self.fn(*t, **self.kwargs)
-            self.signals.result.emit(result)
             self.signals.running.emit(self.thread_name, 0)
+            if self.is_kill:
+                break
+            else:
+                self.signals.result.emit(result)
 
     def kill(self):
         self.is_kill = True

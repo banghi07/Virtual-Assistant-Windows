@@ -94,21 +94,26 @@ QLabel#label_user_answer {
   margin-bottom: 2px;
 }
 
-/* Widget Error Window */
-QWidget#widget_error_window {
+/* Widget response Window */
+QWidget#widget_response_window {
   background-color: #ffffff;
   border: 1px solid #595959;
 }
 
-QLabel#label_error_image {
+QLabel#label_response_image {
   padding: 10px;
 }
 
-QLabel#label_error_details {
+QLabel#label_response_details {
   font: 16px;
   background-color: #e6e6e6;
   border-radius: 5px;
   padding: 10px;
+}
+
+QPushButton#button_ok {
+  font: 16px;
+  padding: 5px 15px 5px 15px;
 }
 
 /* Widget Clock Window */
@@ -566,4 +571,30 @@ QPushButton#button_see_more_result:hover {
   background-color: #f0eeee;
   border: none;
   padding: 10px auto 10px auto;
+}
+
+/* Widget Trans Window */
+QWidget#widget_trans_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_detect_lang {
+  font: 14px;
+}
+
+QLabel#label_text_src {
+  font: 16px;
+}
+
+QLabel#label_trans_to_vi {
+  font: 14px;
+}
+
+QLabel#label_text_dest {
+  font: 16px;
+}
+
+QLabel#label_trans_error {
+  font: 16px;
 }

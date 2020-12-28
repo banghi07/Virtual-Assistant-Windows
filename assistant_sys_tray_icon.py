@@ -10,7 +10,7 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         self.assistant = assistant
 
-        icon = QIcon("./icon/fugue-icons-3.5.6/icons/application-plus-black.png")
+        icon = QIcon("./icon/tray_icon/application-plus-black.png")
         self.setIcon(icon)
         self.setVisible(True)
 
@@ -31,7 +31,7 @@ class SystemTrayIcon(QSystemTrayIcon):
     def update_translation_action(self, opt=0):
         if opt:
             self.translation_action.setEnabled(True)
-            self.translation_action.setIcon(QIcon("./icon/confirm-16px.png"))
+            self.translation_action.setIcon(QIcon("./icon/tray_icon/confirm-16px.png"))
             self.translation_action.triggered.connect(self.exit_trans_thread)
         else:
             self.translation_action.setEnabled(False)

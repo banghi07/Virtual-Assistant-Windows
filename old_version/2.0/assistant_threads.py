@@ -14,6 +14,7 @@ class LostInternetConnection(Exception):
 
 
 class ThreadSignals(QObject):
+    running = pyqtSignal(str, int)
     finished = pyqtSignal()
     error_internet = pyqtSignal(int)
     result = pyqtSignal(object)
@@ -26,10 +27,14 @@ class Thread(QRunnable):
         self.args = args
         self.kwargs = kwargs
         self.is_kill = False
+        self.thread_name = list(self.args)[-1]
         self.signals = ThreadSignals()
 
     @pyqtSlot()
     def run(self):
+        l = list(self.args)
+        l.pop()
+        t = tuple(l)
         url = "http://www.google.com/"
         try:
             try:
@@ -38,6 +43,7 @@ class Thread(QRunnable):
                 self.signals.error_internet.emit(1)
             else:
                 try:
+                    self.signals.running.emit(self.thread_name, 1)
                     result = self.fn(*t, **self.kwargs)
 
                     if self.is_kill:
@@ -47,6 +53,7 @@ class Thread(QRunnable):
                     pass
                 else:
                     self.signals.result.emit(result)
+                    self.signals.running.emit(self.thread_name, 0)
                     self.signals.finished.emit()
         except:
             pass
@@ -56,6 +63,7 @@ class Thread(QRunnable):
 
 
 class ThreadTransSignals(QObject):
+    running = pyqtSignal(str, int)
     result = pyqtSignal(object)
     error_internet = pyqtSignal(int)
 
@@ -67,10 +75,14 @@ class ThreadTrans(QRunnable):
         self.args = args
         self.kwargs = kwargs
         self.is_kill = False
+        self.thread_name = list(self.args)[-1]
         self.signals = ThreadTransSignals()
 
     @pyqtSlot()
     def run(self):
+        l = list(self.args)
+        l.pop()
+        t = tuple(l)
         url = "http://www.google.com/"
         try:
             try:
@@ -79,7 +91,9 @@ class ThreadTrans(QRunnable):
                 self.signals.error_internet.emit(1)
             else:
                 while True:
+                    self.signals.running.emit(self.thread_name, 1)
                     result = self.fn(*t, **self.kwargs)
+                    self.signals.running.emit(self.thread_name, 0)
                     if self.is_kill:
                         break
                     else:

@@ -1,0 +1,616 @@
+/* QWidget {
+  border: 1px solid black;
+} */
+
+/* Initial */
+QWidget#widget_title_bar {
+  background-color: #ffffff;
+  border-top: 1px solid #595959;
+  border-left: 1px solid #595959;
+  border-right: 1px solid #595959;
+}
+
+QPushButton#button_close {
+  border-style: none;
+  border-top: 1px solid #595959;
+  border-right: 1px solid #595959;
+}
+
+QPushButton#button_close:hover {
+  background-color: #e6e6e6;
+  border-style: none;
+  border-top: 1px solid #595959;
+  border-right: 1px solid #595959;
+}
+
+QPushButton#button_close:pressed {
+  background-color: #ff471a;
+  border-style: none;
+  border-top: 1px solid #595959;
+  border-right: 1px solid #595959;
+}
+
+QWidget#widget_bottom_bar {
+  background-color: #e6e6e6;
+  border-bottom: 1px solid #595959;
+  border-left: 1px solid #595959;
+  border-right: 1px solid #595959;
+}
+
+QPushButton#button_microphone {
+  border-style: none;
+  border-right: 1px solid #595959;
+  border-bottom: 1px solid #595959;
+}
+
+QPushButton#button_microphone:hover {
+  background-color: #8b989e;
+  border-style: none;
+  border-right: 1px solid #595959;
+  border-bottom: 1px solid #595959;
+}
+
+QPushButton#button_microphone:pressed {
+  background-color: #b8b8b8;
+  border-style: none;
+  border-right: 1px solid #595959;
+  border-bottom: 1px solid #595959;
+}
+
+/* Main Window */
+QWidget#widget_main_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_assistant_ask {
+  font: 16px;
+  background-color: #e6e6e6;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+QLabel#label_assistant_hint {
+  font: 14px;
+}
+
+QPushButton#icon_user_message {
+  border-style: none;
+}
+
+QPushButton#icon_sound_waves {
+  border-style: none;
+}
+
+QLabel#label_assistant_listening {
+  font: 16px;
+  color: #064d69;
+  margin-bottom: 2px;
+}
+
+QLabel#label_user_answer {
+  font: 16px;
+  color: #e23046;
+  margin-bottom: 2px;
+}
+
+/* Response Window */
+QWidget#widget_response_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_response_image {
+  padding: 10px;
+}
+
+QLabel#label_response_details {
+  font: 16px;
+  background-color: #e6e6e6;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+QPushButton#button_ok {
+  font: 16px;
+  padding: 5px 15px 5px 15px;
+}
+
+/* Clock Window */
+QWidget#widget_clock_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_time_zone {
+  font: 16px;
+}
+
+QLabel#label_colon {
+  font: 40px;
+}
+
+QLabel#label_colon2 {
+  font: 40px;
+}
+
+QLabel#label_hour {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_minute {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_second {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_date_in_clock_window {
+  font: 20px;
+}
+
+/* Date Window */
+QWidget#widget_date_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_time_zone {
+  font: 16px;
+}
+
+QLabel#label_slash {
+  font: 40px;
+}
+
+QLabel#label_slash2 {
+  font: 40px;
+}
+
+QLabel#label_day {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_month {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_year {
+  font: 32px;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  background-color: #e6e6e6;
+}
+
+QLabel#label_clock_in_date_window {
+  font: 20px;
+}
+
+/* Loading Window */
+QWidget#widget_loading_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_assistant_loading {
+  font: 16px;
+  background-color: #e6e6e6;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+/* Weather Window */
+QWidget#widget_weather_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_city_name {
+  font: 16px;
+}
+
+QLabel#label_temp {
+  font: 40px;
+}
+
+QLabel#label_desc {
+  font: 16px;
+}
+
+QLabel#label_pressure {
+  font: 16px;
+}
+
+QLabel#label_humidity {
+  font: 16px;
+}
+
+QLabel#label_cloud {
+  font: 16px;
+}
+
+QLabel#label_wind {
+  font: 16px;
+}
+
+QLabel#label_uvi {
+  font: 16px;
+}
+
+QLabel#label_visible {
+  font: 16px;
+}
+
+/* News Window */
+QWidget#widget_news_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#title_news {
+  font: 16px;
+  color: #ff4c4c;
+  margin-left: 10px;
+}
+
+QPushButton#topic_button_1 {
+  font: 14px;
+  background-color: lightgray;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_1:hover {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #0099e5;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_1:pressed {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #7e7e7e;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_1:disabled {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #e23046;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_2 {
+  font: 14px;
+  background-color: lightgray;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_2:hover {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #0099e5;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_2:pressed {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #7e7e7e;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_2:disabled {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #e23046;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_3 {
+  font: 14px;
+  background-color: lightgray;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_3:hover {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #0099e5;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_3:pressed {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #7e7e7e;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_3:disabled {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #e23046;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_4 {
+  font: 14px;
+  background-color: lightgray;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_4:hover {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #0099e5;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_4:pressed {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #7e7e7e;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_4:disabled {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #e23046;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_5 {
+  font: 14px;
+  background-color: lightgray;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_5:hover {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #0099e5;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_5:pressed {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #7e7e7e;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QPushButton#topic_button_5:disabled {
+  font: 14px;
+  color: #e6e6e6;
+  background-color: #e23046;
+  padding: 5px 15px 5px 15px;
+  border-radius: 10px;
+}
+
+QScrollArea#scroll_area_news {
+  border-top: none;
+  border-bottom: none;
+}
+
+QWidget#scroll_area_news_content {
+  background-color: #ffffff;
+}
+
+QWidget#widget_news {
+  background-color: #f3f3f3;
+}
+
+QLabel#label_title_news {
+  font: 16px;
+}
+
+QLabel#label_desc_news {
+  font: 16px;
+}
+
+QPushButton#button_read_more {
+  font: 14px;
+}
+
+QPushButton#button_see_more_news {
+  font: 14px;
+  color: rgb(110, 110, 110);
+  background-color: #f0eeee;
+  border: none;
+  padding: 10px auto 10px auto;
+}
+
+QPushButton#button_see_more_news:hover {
+  font: 14px;
+  color: #e23046;
+  background-color: #f0eeee;
+  border: none;
+  padding: 10px auto 10px auto;
+}
+
+/* Wikipedia Window */
+QWidget#widget_wiki_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#title_wiki {
+  font: 25px;
+  color: #e23046;
+}
+
+QLabel#label_keyword {
+  font: 20px;
+  color: #0099e5;
+}
+
+QPlainTextEdit#meaning_of_keyword {
+  font: 16px;
+  border-top: none;
+  border-bottom: none;
+}
+
+/* Search Default Window */
+QWidget#widget_search_default_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLineEdit#search_box {
+  font: 16px;
+  padding: 0px 15px 0px 15px;
+  border: 1px solid black;
+  border-right: none;
+  border-top-left-radius: 17px;
+  border-bottom-left-radius: 17px;
+}
+
+QPushButton#icon_search_magnifying {
+  border: 1px solid black;
+  border-left: none;
+  border-top-right-radius: 17;
+  border-bottom-right-radius: 17;
+}
+
+QLabel#label_about_of_result {
+  font: 14px;
+  padding-left: 15px;
+}
+
+QScrollArea#scroll_area_result {
+  border-bottom: none;
+  border-top: none;
+}
+
+QWidget#scroll_area_result_content {
+  background-color: white;
+}
+
+QLabel#label_link_result {
+  font: 14px;
+}
+
+QPushButton#button_title_result {
+  font: 16px;
+  color: #1875e5;
+  font-weight: bold;
+  text-align: left;
+  border: none;
+}
+
+QPushButton#button_title_result:hover {
+  font: 16px;
+  color: #1875e5;
+  font-weight: bold;
+  text-align: left;
+  text-decoration: underline;
+  border: none;
+}
+
+QPushButton#button_title_result:pressed {
+  font: 16px;
+  color: #c5523f;
+  font-weight: bold;
+  text-align: left;
+  text-decoration: underline;
+  border: none;
+}
+
+QLabel#label_snippet_result {
+  font: 15px;
+}
+
+QPushButton#button_see_more_result {
+  font: 14px;
+  color: rgb(110, 110, 110);
+  background-color: #f0eeee;
+  border: none;
+  padding: 10px auto 10px auto;
+}
+
+QPushButton#button_see_more_result:hover {
+  font: 14px;
+  color: #e23046;
+  background-color: #f0eeee;
+  border: none;
+  padding: 10px auto 10px auto;
+}
+
+/* Translation Window */
+QWidget#widget_trans_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QLabel#label_detect_lang {
+  font: 14px;
+}
+
+QLabel#label_text_src {
+  font: 16px;
+}
+
+QLabel#label_trans_to_vi {
+  font: 14px;
+}
+
+QLabel#label_text_dest {
+  font: 16px;
+}
+
+QLabel#label_trans_error {
+  font: 16px;
+}
+
+/* Help Window */
+QWidget#widget_help_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QPlainTextEdit#plain_text_help {
+  font: 16px;
+  background-color: none;
+  border: none;
+}
+
+QLabel#label_text_help {
+  font: 16px;
+}

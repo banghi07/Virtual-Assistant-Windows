@@ -39,14 +39,14 @@ class SystemTrayIcon(QSystemTrayIcon):
 
     def exit_trans_thread(self):
         try:
-            self.assistant.exit_dict()
+            self.assistant.trans_thread.kill()
             self.update_translation_action()
         except:
             pass
 
     def exit_app(self):
         try:
-            self.assistant.exit_dict()
+            self.assistant.trans_thread.kill()
         except:
             pass
         QCoreApplication.exit()

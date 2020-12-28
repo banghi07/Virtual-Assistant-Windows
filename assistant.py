@@ -25,6 +25,7 @@ from assistant_threads import *
 from assistant_window import *
 from google_trans_new import google_translator
 from assistant_sys_tray_icon import SystemTrayIcon
+from pprint import pprint
 
 
 class Assistant:
@@ -40,7 +41,7 @@ class Assistant:
         self.tray_icon.activated.connect(self.activate)
 
         self.MainWindow = Window()
-        self.FormTrans = Window(1)
+        self.FormTrans = Form()
         self.ui = UI_Windows()
         self.ui_button_connect()
         self.initial_assistant()
@@ -62,6 +63,7 @@ class Assistant:
         if text.isnumeric():
             s = "play_sound_" + text
             self.thread = Thread(self.play_sound, text, s)
+            self.thread.signals.error_internet.connect(self.lost_internet_connection)
             self.thread.signals.running.connect(self.update_thread_list)
             self.threadpool.start(self.thread)
         else:
@@ -76,7 +78,7 @@ class Assistant:
             playsound("./audio/sound.mp3", False)
             os.remove("./audio/sound.mp3")
         except:
-            print("Error: Token Google Translate. Try again...")
+            print("Error: Google Translate. Try again...")
             os.remove("./audio/sound.mp3")
             self.speak(text)
 
@@ -103,6 +105,7 @@ class Assistant:
     def get_text_from_audio_thread(self, function):
         self.thread = Thread(self.speech_recognition, "speech_recognition")
         self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.ui.update_bottom_bar)
         self.thread.signals.result.connect(self.user_request)
         self.threadpool.start(self.thread)
@@ -158,6 +161,15 @@ class Assistant:
         playsound("./audio/101_notification.wav", False)
         self.get_text_from_audio_thread(self.user_request)
 
+    def lost_internet_connection(self, error):
+        if error:
+            url = "./icon/no-wifi-256px.png"
+            text = "Vui lòng kiểm tra lại Internet."
+            self.ui.setupUI_response_window(self.MainWindow, url, text)
+            self.speak_thread(text)
+        else:
+            pass
+
     # * User Request
     def user_request(self, text):
         delay = ThreadDelay(1, text)
@@ -168,6 +180,8 @@ class Assistant:
                 delay.signals.finished.connect(self.get_time_thread)
             elif "ngày" in text or "thứ" in text:
                 delay.signals.finished.connect(self.get_date_thread)
+            else:
+                delay.signals.finished.connect(self.search_default_thread)
         elif "mở video" in text or "mở bài" in text:
             delay.signals.args.connect(self.play_song_thread)
         elif "thời tiết" in text:
@@ -183,22 +197,23 @@ class Assistant:
             delay.signals.args.connect(self.lookup_wikipedia_thread)
         elif "từ điển" in text:
             delay.signals.finished.connect(self.translation_thread)
+        elif "trợ giúp" in text:
+            delay.signals.finished.connect(self.assistant_help_thread)
         else:
             delay.signals.args.connect(self.search_default_thread)
 
         self.threadpool.start(delay)
 
-    # * func_no1:
     def didnt_hear(self):
         url = "./icon/mute-microphone-256px.png"
         text = "Xin lỗi tôi không nghe rõ bạn nói gì."
         self.ui.setupUI_response_window(self.MainWindow, url, text)
         self.speak_thread("001")
 
-    # * func_no2:
     def get_time_thread(self):
         self.thread = Thread(self.get_time, "get_time")
         self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.get_time_complete)
         self.threadpool.start(self.thread)
 
@@ -247,10 +262,10 @@ class Assistant:
         self.ui.setupUI_clock_window(self.MainWindow, result)
         self.speak_thread(speech)
 
-    # * func_no3:
     def get_date_thread(self):
         self.thread = Thread(self.get_time, "get_date")
         self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.get_date_complete)
         self.threadpool.start(self.thread)
 
@@ -299,7 +314,6 @@ class Assistant:
         self.ui.setupUI_date_window(self.MainWindow, result)
         self.speak_thread(speech)
 
-    # * func_no4:
     def play_song_thread(self, text):
         if "mở video" in text:
             reg_ex = re.search("mở video", text)
@@ -321,6 +335,7 @@ class Assistant:
 
         self.thread = Thread(self.play_song, song_name, "play_song")
         self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.play_song_complete)
         self.threadpool.start(self.thread)
 
@@ -358,8 +373,9 @@ class Assistant:
             pass
         else:
             self.thread = Thread(self.what_weather, city, "what_weather")
-            self.thread.signals.result.connect(self.what_weather_complete)
             self.thread.signals.running.connect(self.update_thread_list)
+            self.thread.signals.error_internet.connect(self.lost_internet_connection)
+            self.thread.signals.result.connect(self.what_weather_complete)
             self.threadpool.start(self.thread)
 
     def what_weather(self, city):
@@ -432,6 +448,7 @@ class Assistant:
     def search_news_thread(self, opt=0):
         self.thread = Thread(self.search_news, opt, "search_news")
         self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.search_news_complete)
         self.threadpool.start(self.thread)
 
@@ -548,6 +565,7 @@ class Assistant:
 
         self.thread = Thread(self.open_website, text, "open_website")
         self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.open_website_complete)
         self.threadpool.start(self.thread)
 
@@ -625,10 +643,14 @@ class Assistant:
         end = len(text)
         keyword = text[start:end]
 
-        self.thread = Thread(self.lookup_wikipedia, keyword, "lookup_wikipedia")
-        self.thread.signals.running.connect(self.update_thread_list)
-        self.thread.signals.result.connect(self.lookup_wikipedia_complete)
-        self.threadpool.start(self.thread)
+        if len(keyword) > 0:
+            self.thread = Thread(self.lookup_wikipedia, keyword, "lookup_wikipedia")
+            self.thread.signals.running.connect(self.update_thread_list)
+            self.thread.signals.error_internet.connect(self.lost_internet_connection)
+            self.thread.signals.result.connect(self.lookup_wikipedia_complete)
+            self.threadpool.start(self.thread)
+        else:
+            self.search_default_thread(text)
 
     def lookup_wikipedia(self, keyword):
         wikipedia.set_lang("vi")
@@ -645,6 +667,7 @@ class Assistant:
     def search_default_thread(self, text):
         self.thread = Thread(self.search_default, text, "search_default")
         self.thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.search_default_complete)
         self.threadpool.start(self.thread)
 
@@ -664,11 +687,20 @@ class Assistant:
             key = str(i)
 
             values = {
-                "formatted_url": response["items"][i]["formattedUrl"],
-                "title": response["items"][i]["title"],
-                "snippet": str(response["items"][i]["snippet"]).strip("\n"),
-                "link": response["items"][i]["link"],
+                "formatted_url": response["items"][i]["formattedUrl"]
+                if "formattedUrl" in response["items"][i]
+                else "",
+                "title": response["items"][i]["title"]
+                if "title" in response["items"][i]
+                else "",
+                "snippet": str(response["items"][i]["snippet"]).strip("\n")
+                if "snippet" in response["items"][i]
+                else "",
+                "link": response["items"][i]["link"]
+                if "link" in response["items"][i]
+                else "",
             }
+
             result.update({key: values})
 
         result.update({"text": text})
@@ -699,6 +731,7 @@ class Assistant:
 
         self.trans_thread = ThreadTrans(self.translation, "translation")
         self.trans_thread.signals.running.connect(self.update_thread_list)
+        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.trans_thread.signals.result.connect(self.translation_complete)
         self.threadpool.start(self.trans_thread)
 
@@ -762,8 +795,12 @@ class Assistant:
         else:
             self.ui.setupUI_trans_window(self.FormTrans, result)
 
-    def exit_dict(self):
+    def kill_translation_thread(self):
         self.trans_thread.kill()
+
+    def assistant_help_thread(self):
+        self.ui.setupUI_help_window(self.MainWindow)
+        self.speak_thread("002")
 
 
 if __name__ == "__main__":

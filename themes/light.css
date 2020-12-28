@@ -57,7 +57,7 @@ QPushButton#button_microphone:pressed {
   border-bottom: 1px solid #595959;
 }
 
-/* Widget Main Window */
+/* Main Window */
 QWidget#widget_main_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -94,7 +94,7 @@ QLabel#label_user_answer {
   margin-bottom: 2px;
 }
 
-/* Widget response Window */
+/* Response Window */
 QWidget#widget_response_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -116,7 +116,7 @@ QPushButton#button_ok {
   padding: 5px 15px 5px 15px;
 }
 
-/* Widget Clock Window */
+/* Clock Window */
 QWidget#widget_clock_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -159,7 +159,7 @@ QLabel#label_date_in_clock_window {
   font: 20px;
 }
 
-/* Widget Date Window */
+/* Date Window */
 QWidget#widget_date_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -202,7 +202,7 @@ QLabel#label_clock_in_date_window {
   font: 20px;
 }
 
-/* Widget Loading Window */
+/* Loading Window */
 QWidget#widget_loading_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -215,7 +215,7 @@ QLabel#label_assistant_loading {
   padding: 10px;
 }
 
-/* Widget Weather Window */
+/* Weather Window */
 QWidget#widget_weather_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -257,7 +257,7 @@ QLabel#label_visible {
   font: 16px;
 }
 
-/* Widget News Window */
+/* News Window */
 QWidget#widget_news_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -465,7 +465,7 @@ QPushButton#button_see_more_news:hover {
   padding: 10px auto 10px auto;
 }
 
-/* Widget Wikipedia Window */
+/* Wikipedia Window */
 QWidget#widget_wiki_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -487,7 +487,7 @@ QPlainTextEdit#meaning_of_keyword {
   border-bottom: none;
 }
 
-/* Widget Search Default Window */
+/* Search Default Window */
 QWidget#widget_search_default_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -573,7 +573,7 @@ QPushButton#button_see_more_result:hover {
   padding: 10px auto 10px auto;
 }
 
-/* Widget Trans Window */
+/* Translation Window */
 QWidget#widget_trans_window {
   background-color: #ffffff;
   border: 1px solid #595959;
@@ -596,5 +596,21 @@ QLabel#label_text_dest {
 }
 
 QLabel#label_trans_error {
+  font: 16px;
+}
+
+/* Help Window */
+QWidget#widget_help_window {
+  background-color: #ffffff;
+  border: 1px solid #595959;
+}
+
+QPlainTextEdit#plain_text_help {
+  font: 16px;
+  background-color: none;
+  border: none;
+}
+
+QLabel#label_text_help {
   font: 16px;
 }

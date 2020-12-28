@@ -6,20 +6,18 @@ import webbrowser
 
 
 class Window(QMainWindow):
-    def __init__(self, option=0):
+    def __init__(
+        self,
+    ):
         super().__init__()
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
         self.setStyleSheet(open("./themes/light.css").read())
+
         self.widget_container = QWidget()
         self.widget_container.setObjectName("widget_container")
         self.layout_container = QVBoxLayout(self.widget_container)
-
-        if option:
-            self.setWindowFlags(Qt.FramelessWindowHint | Qt.Popup)
-            self.layout_container.setContentsMargins(0, 0, 0, 0)
-        else:
-            self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
-            self.setAttribute(Qt.WA_TranslucentBackground)
-            self.layout_container.setContentsMargins(10, 10, 10, 10)
+        self.layout_container.setContentsMargins(10, 10, 10, 10)
 
         self.setCentralWidget(self.widget_container)
 
@@ -43,6 +41,20 @@ class Window(QMainWindow):
 
         self.move(round(x), round(y))
 
+
+class Form(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setStyleSheet(open("./themes/light.css").read())
+        self.widget_container = QWidget()
+        self.widget_container.setObjectName("widget_container")
+        self.layout_container = QVBoxLayout(self.widget_container)
+
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Popup)
+        self.layout_container.setContentsMargins(0, 0, 0, 0)
+
+        self.setCentralWidget(self.widget_container)
+
     def set_location_window(self, result):
         desktop = QDesktopWidget()
         screen_width = desktop.width()
@@ -64,7 +76,6 @@ class Window(QMainWindow):
 
 
 class UI_Windows(object):
-    # * Init button, title & bottom bar
     def __init__(self):
         self.init_button_close()
         self.init_button_microphone()
@@ -166,24 +177,6 @@ class UI_Windows(object):
         else:
             pass
 
-    def init_button_close_2(self):
-        self.button_close_2 = QPushButton()
-        self.button_close_2.setObjectName("button_close_2")
-        self.button_close_2.setFixedSize(10, 10)
-        self.button_close_2.setIcon(QIcon("./icon/cancel-16px.png"))
-
-    def init_button_speak_En(self):
-        self.button_speak_En = QPushButton()
-        self.button_speak_En.setObjectName("button_speak_En")
-        self.button_speak_En.setFixedSize(24, 24)
-        self.button_speak_En.setIcon(QIcon("./icon/speaker-32px.png"))
-
-    def init_button_speak_Vi(self):
-        self.button_speak_Vi = QPushButton()
-        self.button_speak_Vi.setObjectName("button_speak_Vi")
-        self.button_speak_Vi.setFixedSize(24, 24)
-        self.button_speak_Vi.setIcon(QIcon("./icon/speaker-32px.png"))
-
     def add_widget_space_vertical(self, height, layout):
         widget_spaceV = QWidget()
         widget_spaceV.setFixedHeight(height)
@@ -196,7 +189,6 @@ class UI_Windows(object):
 
         layout.addWidget(widget_spaceH)
 
-    # * UI main window
     def setupUI_main_window(self, MainWindow):
         self.clear_UI(MainWindow)
         MainWindow.setFixedSize(520, 470)
@@ -279,7 +271,6 @@ class UI_Windows(object):
 
         self.layout_main_window.addWidget(self.widget_assistant_hint)
 
-    # * UI response window
     def setupUI_response_window(self, MainWindow, url, text, option=0):
         self.clear_UI(MainWindow)
         MainWindow.setFixedSize(520, 470)
@@ -821,11 +812,6 @@ class UI_Windows(object):
         self.widget_title_bar.setFixedSize(700, 35)
         self.layout_news_window.addWidget(self.widget_title_bar)
 
-        # title_news = QLabel("<b>Tin Tức VNExpress</b>")
-        # title_news.setObjectName("title_news")
-        # title_news.setTextFormat(Qt.RichText)
-        # self.layout_news_window.addWidget(title_news)
-
         self.display_topic_buttons()
 
         self.display_topic_content()
@@ -1227,70 +1213,125 @@ class UI_Windows(object):
         self.layout_trans_window.setContentsMargins(10, 10, 10, 10)
 
         if result["error"]:
-            self.label_text_dest = QLabel(result["text"])
-            self.label_text_dest.setObjectName("label_text_dest")
-            self.label_text_dest.setWordWrap(True)
-            self.label_text_dest.adjustSize()
-
-            self.layout_trans_window.addStretch()
-            self.layout_trans_window.addWidget(self.label_text_dest)
-            self.layout_trans_window.addStretch()
+            self.display_error_trans(result)
         else:
             if len(result["src"]) < 15:
-                self.widget_contain_0 = QWidget()
-                self.layout_contain_0 = QVBoxLayout(self.widget_contain_0)
-                self.layout_contain_0.setContentsMargins(0, 0, 0, 0)
-
-                self.label_detect_lang = QLabel(result["detect"])
-                self.label_detect_lang.setObjectName("label_detect_lang")
-
-                self.widget_contain_1 = QWidget()
-                self.layout_contain_1 = QVBoxLayout(self.widget_contain_1)
-                self.layout_contain_1.setContentsMargins(0, 0, 0, 0)
-
-                self.label_text_src = QLabel(result["src"])
-                self.label_text_src.setObjectName("label_text_src")
-
-                self.layout_contain_1.addWidget(self.label_text_src)
-                self.widget_contain_1.adjustSize()
-
-                self.label_trans_to_vi = QLabel("Vietnamese")
-                self.label_trans_to_vi.setObjectName("label_trans_to_vi")
-
-                self.widget_contain_2 = QWidget()
-                self.layout_contain_2 = QVBoxLayout(self.widget_contain_2)
-                self.layout_contain_2.setContentsMargins(0, 0, 0, 0)
-
-                self.label_text_dest = QLabel(result["dest"])
-                self.label_text_dest.setObjectName("label_text_dest")
-
-                self.layout_contain_2.addWidget(self.label_text_dest)
-                self.widget_contain_1.adjustSize()
-
-                self.layout_contain_0.addWidget(self.label_detect_lang)
-                self.layout_contain_0.addWidget(self.widget_contain_1)
-                self.layout_contain_0.addWidget(self.label_trans_to_vi)
-                self.layout_contain_0.addWidget(self.widget_contain_2)
-
-                self.layout_trans_window.addWidget(self.widget_contain_0)
-
+                self.display_trans_word_window(result)
             else:
-                self.label_text_dest = QLabel(result["dest"])
-                self.label_text_dest.setObjectName("label_text_dest")
-                self.label_text_dest.setWordWrap(True)
-
-                self.layout_trans_window.addStretch()
-                self.layout_trans_window.addWidget(self.label_text_dest)
-                self.layout_trans_window.addStretch()
+                self.display_trans_paragraph_window(result)
 
         MainWindow.layout_container.addWidget(self.widget_trans_window)
         MainWindow.show()
         MainWindow.set_location_window(result)
 
+    def display_error_trans(self, result):
+        label_text_dest = QLabel(result["text"])
+        label_text_dest.setObjectName("label_text_dest")
+        label_text_dest.setWordWrap(True)
+        label_text_dest.adjustSize()
+
+        self.layout_trans_window.addStretch()
+        self.layout_trans_window.addWidget(label_text_dest)
+        self.layout_trans_window.addStretch()
+
+    def display_trans_word_window(self, result):
+        widget_contain_0 = QWidget()
+        layout_contain_0 = QVBoxLayout(widget_contain_0)
+        layout_contain_0.setContentsMargins(0, 0, 0, 0)
+
+        label_detect_lang = QLabel(result["detect"])
+        label_detect_lang.setObjectName("label_detect_lang")
+
+        widget_contain_1 = QWidget()
+        layout_contain_1 = QVBoxLayout(widget_contain_1)
+        layout_contain_1.setContentsMargins(0, 0, 0, 0)
+
+        label_text_src = QLabel(result["src"])
+        label_text_src.setObjectName("label_text_src")
+
+        layout_contain_1.addWidget(label_text_src)
+        widget_contain_1.adjustSize()
+
+        label_trans_to_vi = QLabel("Vietnamese")
+        label_trans_to_vi.setObjectName("label_trans_to_vi")
+
+        widget_contain_2 = QWidget()
+        layout_contain_2 = QVBoxLayout(widget_contain_2)
+        layout_contain_2.setContentsMargins(0, 0, 0, 0)
+
+        label_text_dest = QLabel(result["dest"])
+        label_text_dest.setObjectName("label_text_dest")
+
+        layout_contain_2.addWidget(label_text_dest)
+        widget_contain_1.adjustSize()
+
+        layout_contain_0.addWidget(label_detect_lang)
+        layout_contain_0.addWidget(widget_contain_1)
+        layout_contain_0.addWidget(label_trans_to_vi)
+        layout_contain_0.addWidget(widget_contain_2)
+
+        self.layout_trans_window.addWidget(widget_contain_0)
+
+    def display_trans_paragraph_window(self, result):
+        self.label_text_dest = QLabel(result["dest"])
+        self.label_text_dest.setObjectName("label_text_dest")
+        self.label_text_dest.setWordWrap(True)
+
+        self.layout_trans_window.addStretch()
+        self.layout_trans_window.addWidget(self.label_text_dest)
+        self.layout_trans_window.addStretch()
+
+    def setupUI_help_window(self, MainWindow):
+        self.clear_UI(MainWindow)
+        MainWindow.setFixedSize(520, 470)
+
+        self.widget_help_window = QWidget()
+        self.widget_help_window.setObjectName("widget_help_window")
+
+        self.layout_help_window = QVBoxLayout(self.widget_help_window)
+        self.layout_help_window.setContentsMargins(0, 0, 0, 0)
+
+        self.widget_title_bar.setFixedSize(500, 35)
+        self.layout_help_window.addWidget(self.widget_title_bar)
+
+        self.display_assistant_help()
+
+        self.layout_help_window.addStretch()
+
+        self.widget_bottom_bar.setFixedSize(500, 40)
+        self.layout_help_window.addWidget(self.widget_bottom_bar)
+        self.update_bottom_bar(1)
+
+        MainWindow.layout_container.addWidget(self.widget_help_window)
+        MainWindow.set_shadow_window()
+        MainWindow.show()
+        MainWindow.set_center_screen()
+
+    def display_assistant_help(self):
+        label_text_help = QLabel()
+        label_text_help.setObjectName("label_text_help")
+        label_text_help.setWordWrap(True)
+
+        text = """
+        Tôi có thể giúp bạn thực hiện những việc sau:
+        
+            1. Xem ngày, giờ
+            2. Xem dự báo thời tiết
+            3. Xem tin tức thời sự
+            4. Xem định nghĩa từ với Wikipedia
+            5. Mở video trên Youtube
+            6. Mở một website hoặc phần mềm
+            7. Dịch từ hoặc câu sang tiếng Việt
+            8. Tìm kiếm với Google
+        """
+
+        label_text_help.setText(text)
+        self.layout_help_window.addWidget(label_text_help)
+
 
 # if __name__ == "__main__":
-# app = QApplication(sys.argv)
-# MainWindow = TransForm()
-# ui = UI_TransForm()
-# ui.setupUI_trans_window(MainWindow)
-# sys.exit(app.exec_())
+#     app = QApplication(sys.argv)
+#     MainWindow = Window()
+#     ui = UI_Windows()
+#     ui.setupUI_help_window(MainWindow)
+#     sys.exit(app.exec_())

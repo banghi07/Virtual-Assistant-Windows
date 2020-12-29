@@ -9,7 +9,6 @@ import webbrowser
 import feedparser
 import pyperclip
 import requests
-from requests.exceptions import Timeout
 import speech_recognition as sr
 import wikipedia
 from fast_youtube_search import search_youtube
@@ -124,8 +123,6 @@ class Assistant:
 
         try:
             response = requests.get(url, timeout=5).json()
-        except Timeout:
-            return 0
         except:
             return 0
         else:
@@ -213,8 +210,6 @@ class Assistant:
                     url.format(api, location["lat"], location["lon"]),
                     timeout=5,
                 ).json()
-            except Timeout:
-                return 0
             except:
                 return 0
             else:
@@ -274,8 +269,6 @@ class Assistant:
                     url.format(api, location["lat"], location["lon"]),
                     timeout=5,
                 ).json()
-            except Timeout:
-                return 0
             except:
                 return 0
             else:
@@ -413,8 +406,6 @@ class Assistant:
 
             try:
                 response = requests.get(url_one_call, timeout=5).json()
-            except Timeout:
-                return 0
             except:
                 return 0
             else:
@@ -698,8 +689,6 @@ class Assistant:
             response = requests.get(
                 url_cse.format(api_cse, cx_cse, page, text, fields), timeout=5
             ).json()
-        except Timeout:
-            return 0
         except:
             return 0
         else:

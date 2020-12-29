@@ -9,6 +9,7 @@ import webbrowser
 import feedparser
 import pyperclip
 import requests
+from requests.exceptions import Timeout
 import speech_recognition as sr
 import wikipedia
 from fast_youtube_search import search_youtube
@@ -55,7 +56,6 @@ class Assistant:
     def speak_thread(self, text):
         if text.isnumeric():
             self.thread = Thread(self.play_sound, text)
-            self.thread.signals.error_internet.connect(self.lost_internet_connection)
             self.threadpool.start(self.thread)
         else:
             self.thread = Thread(self.speak, text)
@@ -68,33 +68,24 @@ class Assistant:
             playsound("./audio/sound.mp3", False)
             os.remove("./audio/sound.mp3")
         except:
-            print("Error: Google Translate. Try again...")
             os.remove("./audio/sound.mp3")
-            self.speak(text)
 
     def play_sound(self, code):
         if "001" in code:
-            playsound("./audio/001_none.mp3")
+            playsound("./audio/001_didnt_hear.mp3")
         elif "002" in code:
             playsound("./audio/002_help_me.mp3")
         elif "003" in code:
-            playsound("./audio/003_good_mor.mp3")
+            playsound("./audio/003_play_song.mp3")
         elif "004" in code:
-            playsound("./audio/004_good_aft.mp3")
+            playsound("./audio/004_wikipedia.mp3")
         elif "005" in code:
-            playsound("./audio/005_good_night.mp3")
+            playsound("./audio/005_open_app.mp3")
         elif "006" in code:
-            playsound("./audio/006_play_song.mp3")
-        elif "007" in code:
-            playsound("./audio/007_wikipedia.mp3")
-        elif "008" in code:
-            playsound("./audio/008_open_app.mp3")
-        elif "009" in code:
-            playsound("./audio/009_open_web.mp3")
+            playsound("./audio/006_open_web.mp3")
 
     def get_text_from_audio_thread(self, function):
         self.thread = Thread(self.speech_recognition)
-        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.ui.update_bottom_bar)
         self.thread.signals.result.connect(self.user_request)
         self.threadpool.start(self.thread)
@@ -106,8 +97,10 @@ class Assistant:
             try:
                 text = r.recognize_google(audio, language="vi-VN")
                 return text.lower()
-            except:
+            except sr.UnknownValueError:
                 return "..."
+            except sr.RequestError:
+                return "...."
 
     # * UI Button Connect
     def ui_button_connect(self):
@@ -128,21 +121,31 @@ class Assistant:
 
     def get_location_from_ip(self):
         url = "https://ipinfo.io/"
-        response = requests.get(url).json()
-        city = response["city"]
-        region = response["region"]
 
-        location = response["loc"].split(",")
-        lat = location[0]
-        lon = location[1]
-
-        result = {"city": city, "region": region, "lat": lat, "lon": lon}
-        return result
+        try:
+            response = requests.get(url, timeout=5).json()
+        except Timeout:
+            return 0
+        except:
+            return 0
+        else:
+            city = response["city"]
+            region = response["region"]
+            location = response["loc"].split(",")
+            lat = location[0]
+            lon = location[1]
+            result = {"city": city, "region": region, "lat": lat, "lon": lon}
+            return result
 
     def find_app(self, name, path):
         for root, dirs, files in os.walk(path):
             if name in files:
                 return os.path.join(root, name)
+
+    def lost_internet_connection(self):
+        url = "./icon/no-wifi-256px.png"
+        text = "Vui lòng kiểm tra lại Internet."
+        self.ui.setupUI_response_window(self.MainWindow, url, text)
 
     # * Initial Assistant
     def initial_assistant(self):
@@ -150,32 +153,27 @@ class Assistant:
         playsound("./audio/101_notification.wav", False)
         self.get_text_from_audio_thread(self.user_request)
 
-    def lost_internet_connection(self, error):
-        if error:
-            url = "./icon/no-wifi-256px.png"
-            text = "Vui lòng kiểm tra lại Internet."
-            self.ui.setupUI_response_window(self.MainWindow, url, text)
-        else:
-            pass
-
     # * User Request
     def user_request(self, text):
         delay = ThreadDelay(1, text)
         if "..." in text:
-            delay.signals.finished.connect(self.didnt_hear)
+            if len(text) == 3:
+                delay.signals.non_args.connect(self.didnt_hear)
+            else:
+                delay.signals.non_args.connect(self.lost_internet_connection)
         elif "hôm nay" in text or "hiện tại" in text or "bây giờ" in text:
             if "giờ" in text:
-                delay.signals.finished.connect(self.get_time_thread)
+                delay.signals.non_args.connect(self.get_time_thread)
             elif "ngày" in text or "thứ" in text:
-                delay.signals.finished.connect(self.get_date_thread)
+                delay.signals.non_args.connect(self.get_date_thread)
             else:
-                delay.signals.finished.connect(self.search_default_thread)
+                delay.signals.non_args.connect(self.search_default_thread)
         elif "mở video" in text or "mở bài" in text:
             delay.signals.args.connect(self.play_song_thread)
         elif "thời tiết" in text:
             delay.signals.args.connect(self.what_weather_thread)
         elif "tin tức" in text:
-            delay.signals.finished.connect(self.search_news_thread)
+            delay.signals.non_args.connect(self.search_news_thread)
         elif "mở" in text:
             if "." in text:
                 delay.signals.args.connect(self.open_website_thread)
@@ -184,9 +182,9 @@ class Assistant:
         elif "tra cứu" in text:
             delay.signals.args.connect(self.lookup_wikipedia_thread)
         elif "từ điển" in text:
-            delay.signals.finished.connect(self.translation_thread)
+            delay.signals.non_args.connect(self.translation_thread)
         elif "trợ giúp" in text:
-            delay.signals.finished.connect(self.assistant_help_thread)
+            delay.signals.non_args.connect(self.assistant_help_thread)
         else:
             delay.signals.args.connect(self.search_default_thread)
 
@@ -200,7 +198,6 @@ class Assistant:
 
     def get_time_thread(self):
         self.thread = Thread(self.get_time)
-        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.get_time_complete)
         self.threadpool.start(self.thread)
 
@@ -209,49 +206,59 @@ class Assistant:
 
         api = "BL83E6LF3XI3"
         url = "http://api.timezonedb.com/v2.1/get-time-zone?key={}&format=json&by=position&lat={}&lng={}"
-        response = requests.get(
-            url.format(api, location["lat"], location["lon"])
-        ).json()
 
-        u = int(response["gmtOffset"]) / 3600
-        if u >= 0:
-            utc = "+" + "{:.0f}".format(u)
-        else:
-            utc = str("{:.0f}".format(u))
+        if location:
+            try:
+                response = requests.get(
+                    url.format(api, location["lat"], location["lon"]),
+                    timeout=5,
+                ).json()
+            except Timeout:
+                return 0
+            except:
+                return 0
+            else:
+                u = int(response["gmtOffset"]) / 3600
+                if u >= 0:
+                    utc = "+" + "{:.0f}".format(u)
+                else:
+                    utc = str("{:.0f}".format(u))
 
-        t = response["formatted"]
-        year = t[0:4]
-        month = t[5:7]
-        day = t[8:10]
-        hour = t[11:13]
-        minute = t[14:16]
-        second = t[17:19]
+                t = response["formatted"]
+                year = t[0:4]
+                month = t[5:7]
+                day = t[8:10]
+                hour = t[11:13]
+                minute = t[14:16]
+                second = t[17:19]
 
-        result = {
-            "city": location["city"],
-            "zone_name": response["zoneName"],
-            "utc": utc,
-            "year": year,
-            "month": month,
-            "day": day,
-            "hour": hour,
-            "minute": minute,
-            "second": second,
-        }
+                result = {
+                    "city": location["city"],
+                    "zone_name": response["zoneName"],
+                    "utc": utc,
+                    "year": year,
+                    "month": month,
+                    "day": day,
+                    "hour": hour,
+                    "minute": minute,
+                    "second": second,
+                }
 
-        return result
+                return result
 
     def get_time_complete(self, result):
-        speech = "Hiện tại là {} giờ {} phút {} giây.".format(
-            result["hour"], result["minute"], result["second"]
-        )
+        if result:
+            speech = "Hiện tại là {} giờ {} phút {} giây.".format(
+                result["hour"], result["minute"], result["second"]
+            )
 
-        self.ui.setupUI_clock_window(self.MainWindow, result)
-        self.speak_thread(speech)
+            self.ui.setupUI_clock_window(self.MainWindow, result)
+            self.speak_thread(speech)
+        else:
+            self.lost_internet_connection()
 
     def get_date_thread(self):
         self.thread = Thread(self.get_time)
-        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.get_date_complete)
         self.threadpool.start(self.thread)
 
@@ -260,45 +267,56 @@ class Assistant:
 
         api = "BL83E6LF3XI3"
         url = "http://api.timezonedb.com/v2.1/get-time-zone?key={}&format=json&by=position&lat={}&lng={}"
-        response = requests.get(
-            url.format(api, location["lat"], location["lon"])
-        ).json()
 
-        u = int(response["gmtOffset"]) / 3600
-        if u >= 0:
-            utc = "+" + "{:.0f}".format(u)
-        else:
-            utc = str("{:.0f}".format(u))
+        if location:
+            try:
+                response = requests.get(
+                    url.format(api, location["lat"], location["lon"]),
+                    timeout=5,
+                ).json()
+            except Timeout:
+                return 0
+            except:
+                return 0
+            else:
+                u = int(response["gmtOffset"]) / 3600
+                if u >= 0:
+                    utc = "+" + "{:.0f}".format(u)
+                else:
+                    utc = str("{:.0f}".format(u))
 
-        t = response["formatted"]
-        year = t[0:4]
-        month = t[5:7]
-        day = t[8:10]
-        hour = t[11:13]
-        minute = t[14:16]
-        second = t[17:19]
+                t = response["formatted"]
+                year = t[0:4]
+                month = t[5:7]
+                day = t[8:10]
+                hour = t[11:13]
+                minute = t[14:16]
+                second = t[17:19]
 
-        result = {
-            "city": location["city"],
-            "zone_name": response["zoneName"],
-            "utc": utc,
-            "year": year,
-            "month": month,
-            "day": day,
-            "hour": hour,
-            "minute": minute,
-            "second": second,
-        }
+                result = {
+                    "city": location["city"],
+                    "zone_name": response["zoneName"],
+                    "utc": utc,
+                    "year": year,
+                    "month": month,
+                    "day": day,
+                    "hour": hour,
+                    "minute": minute,
+                    "second": second,
+                }
 
-        return result
+                return result
 
     def get_date_complete(self, result):
-        speech = "Hôm nay là ngày {} tháng {} năm {}".format(
-            result["day"], result["month"], result["year"]
-        )
+        if result:
+            speech = "Hôm nay là ngày {} tháng {} năm {}".format(
+                result["day"], result["month"], result["year"]
+            )
 
-        self.ui.setupUI_date_window(self.MainWindow, result)
-        self.speak_thread(speech)
+            self.ui.setupUI_date_window(self.MainWindow, result)
+            self.speak_thread(speech)
+        else:
+            self.lost_internet_connection()
 
     def play_song_thread(self, text):
         if "mở video" in text:
@@ -320,21 +338,26 @@ class Assistant:
         self.ui.setupUI_loading_window(self.MainWindow, "Đang mở video....")
 
         self.thread = Thread(self.play_song, song_name)
-        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.play_song_complete)
         self.threadpool.start(self.thread)
 
     def play_song(self, song_name):
-        result = search_youtube([song_name])
-        # result = YoutubeSearch(text, max_results=3).to_dict()
-        url = "https://www.youtube.com/watch?v=" + result[0]["id"]
-        # url = "https://www.youtube.com/" + result[0]["url_suffix"]
-        webbrowser.open(url)
+        try:
+            result = search_youtube([song_name])
+        except:
+            return 0
+        else:
+            url = "https://www.youtube.com/watch?v=" + result[0]["id"]
+            webbrowser.open(url)
+            return 1
 
-    def play_song_complete(self):
-        self.thread = ThreadDelay(1)
-        self.thread.signals.finished.connect(self.close_window)
-        self.threadpool.start(self.thread)
+    def play_song_complete(self, result):
+        if result:
+            self.thread = ThreadDelay(1)
+            self.thread.signals.finished.connect(self.close_window)
+            self.threadpool.start(self.thread)
+        else:
+            self.lost_internet_connection()
 
     def what_weather_thread(self, text):
         if "tỉnh" in text:
@@ -355,10 +378,9 @@ class Assistant:
             city = "default"
 
         if "none" in city:
-            pass
+            self.search_default_thread(text)
         else:
             self.thread = Thread(self.what_weather, city)
-            self.thread.signals.error_internet.connect(self.lost_internet_connection)
             self.thread.signals.result.connect(self.what_weather_complete)
             self.threadpool.start(self.thread)
 
@@ -366,11 +388,12 @@ class Assistant:
         if "default" in city:
             location = self.get_location_from_ip()
 
-            geolocator = Nominatim(user_agent="Virtual Assistant")
-            display_name = geolocator.geocode(location["city"]).address
+            if location:
+                geolocator = Nominatim(user_agent="Virtual Assistant")
+                display_name = geolocator.geocode(location["city"]).address
 
-            lat = location["lat"]
-            lon = location["lon"]
+                lat = location["lat"]
+                lon = location["lon"]
 
         else:
             geolocator = Nominatim(user_agent="Virtual Assistant")
@@ -380,58 +403,67 @@ class Assistant:
             lat = location.latitude
             lon = location.longitude
 
-        api = "4e7ced343986de64b7f54296a111c208"
-        part = "minutely,hourly,daily,alerts"
-        units = "metric"
-        lang = "vi"
-        url = "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude={}&units={}&lang={}&appid={}"
-        url_one_call = url.format(lat, lon, part, units, lang, api)
-        response = requests.get(url_one_call).json()
+        if location:
+            api = "4e7ced343986de64b7f54296a111c208"
+            part = "minutely,hourly,daily,alerts"
+            units = "metric"
+            lang = "vi"
+            url = "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude={}&units={}&lang={}&appid={}"
+            url_one_call = url.format(lat, lon, part, units, lang, api)
 
-        c_cur_time = response["current"]["dt"]
-        c_sunrise = response["current"]["sunrise"]
-        c_sunset = response["current"]["sunset"]
-        c_temp = response["current"]["temp"]
-        c_feel_like = response["current"]["feels_like"]
-        c_pressure = response["current"]["pressure"]
-        c_humidity = response["current"]["humidity"]
-        c_dew_point = response["current"]["dew_point"]
-        c_clouds = response["current"]["clouds"]
-        c_uvi = response["current"]["uvi"]
-        c_visibility = response["current"]["visibility"]
-        c_wind_speed = response["current"]["wind_speed"]
-        c_wind_deg = response["current"]["wind_deg"]
-        c_weather_id = response["current"]["weather"][0]["id"]
-        c_weather_main = response["current"]["weather"][0]["main"]
-        c_weather_description = response["current"]["weather"][0]["description"]
-        c_weather_icon = response["current"]["weather"][0]["icon"]
+            try:
+                response = requests.get(url_one_call, timeout=5).json()
+            except Timeout:
+                return 0
+            except:
+                return 0
+            else:
+                c_cur_time = response["current"]["dt"]
+                c_sunrise = response["current"]["sunrise"]
+                c_sunset = response["current"]["sunset"]
+                c_temp = response["current"]["temp"]
+                c_feel_like = response["current"]["feels_like"]
+                c_pressure = response["current"]["pressure"]
+                c_humidity = response["current"]["humidity"]
+                c_dew_point = response["current"]["dew_point"]
+                c_clouds = response["current"]["clouds"]
+                c_uvi = response["current"]["uvi"]
+                c_visibility = response["current"]["visibility"]
+                c_wind_speed = response["current"]["wind_speed"]
+                c_wind_deg = response["current"]["wind_deg"]
+                c_weather_id = response["current"]["weather"][0]["id"]
+                c_weather_main = response["current"]["weather"][0]["main"]
+                c_weather_description = response["current"]["weather"][0]["description"]
+                c_weather_icon = response["current"]["weather"][0]["icon"]
 
-        result = {
-            "city": display_name,
-            "icon": c_weather_icon,
-            "feel_like": c_feel_like,
-            "desc": c_weather_description,
-            "temp": c_temp,
-            "pressure": c_pressure,
-            "humidity": c_humidity,
-            "cloud": c_clouds,
-            "wind_deg": c_wind_deg,
-            "wind_speed": c_wind_speed,
-            "uvi": c_uvi,
-            "visibility": c_visibility,
-        }
-        return result
+                result = {
+                    "city": display_name,
+                    "icon": c_weather_icon,
+                    "feel_like": c_feel_like,
+                    "desc": c_weather_description,
+                    "temp": c_temp,
+                    "pressure": c_pressure,
+                    "humidity": c_humidity,
+                    "cloud": c_clouds,
+                    "wind_deg": c_wind_deg,
+                    "wind_speed": c_wind_speed,
+                    "uvi": c_uvi,
+                    "visibility": c_visibility,
+                }
+                return result
 
     def what_weather_complete(self, result):
-        speech = "Dự báo thời tiết cho {}. Nhiệt độ là {} độ C, {}.".format(
-            result["city"], result["temp"], result["desc"]
-        )
-        self.ui.setupUI_weather_window(self.MainWindow, result)
-        self.speak_thread(speech)
+        if result:
+            speech = "Dự báo thời tiết cho {}. Nhiệt độ là {} độ C, {}.".format(
+                result["city"], result["temp"], result["desc"]
+            )
+            self.ui.setupUI_weather_window(self.MainWindow, result)
+            self.speak_thread(speech)
+        else:
+            self.lost_internet_connection()
 
     def search_news_thread(self, opt=0):
         self.thread = Thread(self.search_news, opt)
-        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.search_news_complete)
         self.threadpool.start(self.thread)
 
@@ -489,65 +521,67 @@ class Assistant:
                 "see_more": "https://vnexpress.net/khoa-hoc",
             }
 
-        feed = feedparser.parse(url)
-        feed_entries = feed.entries
+        try:
+            feed = feedparser.parse(url)
+        except:
+            pass
+        else:
+            feed_entries = feed.entries
 
-        i = 0
-        for entry in feed_entries:
-            if i == 10:
-                break
+            i = 0
+            for entry in feed_entries:
+                if i == 10:
+                    break
 
-            article_title = entry.title
-            article_link = entry.link
-            # article_published_at = entry.published  # Time Formated
-            article_published_at_parsed = entry.published_parsed  # Time Object
-            content = split_content(entry.summary)
+                article_title = entry.title
+                article_link = entry.link
+                content = split_content(entry.summary)
 
-            filename = "./image/cover" + str(i) + ".jpg"
-            img_url = content["l_img"]
+                filename = "./image/cover" + str(i) + ".jpg"
+                img_url = content["l_img"]
 
-            if "none" in img_url:
-                article = {
-                    "title": article_title,
-                    "published_at": article_published_at_parsed,
-                    "cover_img": "./image/no_img.jpg",
-                    "desc": content["desc"],
-                    "link": article_link,
-                }
+                if "none" in img_url:
+                    article = {
+                        "title": article_title,
+                        "cover_img": "./image/no_img.jpg",
+                        "desc": content["desc"],
+                        "link": article_link,
+                    }
 
-            else:
-                img_data = requests.get(img_url).content
-                with open(filename, "wb") as handler:
-                    handler.write(img_data)
+                else:
+                    img_data = requests.get(img_url).content
+                    with open(filename, "wb") as handler:
+                        handler.write(img_data)
 
-                article = {
-                    "title": article_title,
-                    "published_at": article_published_at_parsed,
-                    "cover_img": filename,
-                    "desc": content["desc"],
-                    "link": article_link,
-                }
+                    article = {
+                        "title": article_title,
+                        "cover_img": filename,
+                        "desc": content["desc"],
+                        "link": article_link,
+                    }
 
-            key = str(i)
-            result.update({key: article})
-            i += 1
+                key = str(i)
+                result.update({key: article})
+                i += 1
 
-        return result
+            return result
 
     def search_news_complete(self, result):
-        if result["is_update"]:
-            self.ui.update_topic_content(self.MainWindow, result)
-            self.ui.update_topic_buttons(result["is_update"])
+        if result:
+            if result["is_update"]:
+                self.ui.update_topic_content(self.MainWindow, result)
+                self.ui.update_topic_buttons(result["is_update"])
+            else:
+                self.ui.topic_button_1.setDisabled(True)
+                self.ui.setupUI_news_window(self.MainWindow, result)
         else:
-            self.ui.topic_button_1.setDisabled(True)
-            self.ui.setupUI_news_window(self.MainWindow, result)
+            self.lost_internet_connection()
 
     def open_website_thread(self, text):
         self.ui.update_bottom_bar()
         self.ui.setupUI_loading_window(self.MainWindow, "Đang mở website....")
 
         self.thread = Thread(self.open_website, text)
-        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.open_website_complete)
         self.threadpool.start(self.thread)
 
@@ -559,6 +593,7 @@ class Assistant:
             webbrowser.open(url)
 
     def open_website_complete(self):
+        self.speak_thread("007")
         self.thread = ThreadDelay(1)
         self.thread.signals.finished.connect(self.close_window)
         self.threadpool.start(self.thread)
@@ -605,7 +640,7 @@ class Assistant:
 
     def open_application_complete(self, result):
         if result:
-            self.thread = ThreadDelay(1, "008")
+            self.thread = ThreadDelay(1, "005")
             self.thread.signals.finished.connect(self.close_window)
             self.thread.signals.args.connect(self.speak_thread)
             self.threadpool.start(self.thread)
@@ -614,7 +649,7 @@ class Assistant:
             url = "./icon/error-256px.png"
             text = "Phần mềm bạn yêu cầu chưa được cài đặt."
             self.ui.setupUI_response_window(self.MainWindow, url, text)
-            self.speak_thread(text)
+            self.speak_thread("006")
 
     def lookup_wikipedia_thread(self, text):
         reg_ex = re.search("tra cứu", text)
@@ -624,27 +659,32 @@ class Assistant:
 
         if len(keyword) > 0:
             self.thread = Thread(self.lookup_wikipedia, keyword)
-            self.thread.signals.error_internet.connect(self.lost_internet_connection)
             self.thread.signals.result.connect(self.lookup_wikipedia_complete)
             self.threadpool.start(self.thread)
         else:
             self.search_default_thread(text)
 
     def lookup_wikipedia(self, keyword):
-        wikipedia.set_lang("vi")
-        result = {
-            "keyword": keyword.title(),
-            "meaning": wikipedia.summary(keyword),
-        }
-        return result
+        try:
+            wikipedia.set_lang("vi")
+        except:
+            return 0
+        else:
+            result = {
+                "keyword": keyword.title(),
+                "meaning": wikipedia.summary(keyword),
+            }
+            return result
 
     def lookup_wikipedia_complete(self, result):
-        self.ui.setupUI_wikipedia_window(self.MainWindow, result)
-        self.speak_thread("007")
+        if result:
+            self.ui.setupUI_wikipedia_window(self.MainWindow, result)
+            self.speak_thread("004")
+        else:
+            self.lost_internet_connection()
 
     def search_default_thread(self, text):
         self.thread = Thread(self.search_default, text)
-        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.thread.signals.result.connect(self.search_default_complete)
         self.threadpool.start(self.thread)
 
@@ -653,52 +693,59 @@ class Assistant:
         cx_cse = "efcdf7a6d77b621bc"
         page = 1
         fields = "searchInformation(formattedTotalResults,formattedSearchTime),items(title,formattedUrl,snippet,link)"
-
         url_cse = "https://www.googleapis.com/customsearch/v1?key={}&cx={}&start={}&q={}&fields={}"
-        response = requests.get(
-            url_cse.format(api_cse, cx_cse, page, text, fields)
-        ).json()
+        try:
+            response = requests.get(
+                url_cse.format(api_cse, cx_cse, page, text, fields), timeout=5
+            ).json()
+        except Timeout:
+            return 0
+        except:
+            return 0
+        else:
+            result = {}
+            for i in range(10):
+                key = str(i)
 
-        result = {}
-        for i in range(10):
-            key = str(i)
+                values = {
+                    "formatted_url": response["items"][i]["formattedUrl"]
+                    if "formattedUrl" in response["items"][i]
+                    else "",
+                    "title": response["items"][i]["title"]
+                    if "title" in response["items"][i]
+                    else "",
+                    "snippet": str(response["items"][i]["snippet"]).strip("\n")
+                    if "snippet" in response["items"][i]
+                    else "",
+                    "link": response["items"][i]["link"]
+                    if "link" in response["items"][i]
+                    else "",
+                }
 
-            values = {
-                "formatted_url": response["items"][i]["formattedUrl"]
-                if "formattedUrl" in response["items"][i]
-                else "",
-                "title": response["items"][i]["title"]
-                if "title" in response["items"][i]
-                else "",
-                "snippet": str(response["items"][i]["snippet"]).strip("\n")
-                if "snippet" in response["items"][i]
-                else "",
-                "link": response["items"][i]["link"]
-                if "link" in response["items"][i]
-                else "",
-            }
+                result.update({key: values})
 
-            result.update({key: values})
+            result.update({"text": text})
 
-        result.update({"text": text})
+            about = "Khoảng {} kết quả ({} giây)\n\n".format(
+                response["searchInformation"]["formattedTotalResults"],
+                response["searchInformation"]["formattedSearchTime"],
+            )
+            result.update({"about": about})
 
-        about = "Khoảng {} kết quả ({} giây)\n\n".format(
-            response["searchInformation"]["formattedTotalResults"],
-            response["searchInformation"]["formattedSearchTime"],
-        )
-        result.update({"about": about})
+            see_more = "https://www.google.com/search?q={}".format(text)
+            result.update({"see_more": see_more})
 
-        see_more = "https://www.google.com/search?q={}".format(text)
-        result.update({"see_more": see_more})
+            speech = "Đây là kết quả tìm kiếm cho {}".format(text)
+            result.update({"speech": speech})
 
-        speech = "Đây là kết quả tìm kiếm cho {}".format(text)
-        result.update({"speech": speech})
-
-        return result
+            return result
 
     def search_default_complete(self, result):
-        self.ui.setupUI_search_default_window(self.MainWindow, result)
-        self.speak_thread(result["speech"])
+        if result:
+            self.ui.setupUI_search_default_window(self.MainWindow, result)
+            self.speak_thread(result["speech"])
+        else:
+            self.lost_internet_connection()
 
     def translation_thread(self):
         url = "./icon/select-256px.png"
@@ -707,7 +754,6 @@ class Assistant:
         self.speak_thread(text)
 
         self.trans_thread = ThreadTrans(self.translation)
-        self.thread.signals.error_internet.connect(self.lost_internet_connection)
         self.trans_thread.signals.result.connect(self.translation_complete)
         self.threadpool.start(self.trans_thread)
 

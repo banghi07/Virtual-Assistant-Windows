@@ -1,8 +1,9 @@
-from PyQt5.QtCore import *
+import sys
 import time
 import traceback
-import sys
+
 import requests
+from PyQt5.QtCore import *
 
 
 class WorkerKillException(Exception):
@@ -33,12 +34,14 @@ class Thread(QRunnable):
         url = "http://www.google.com/"
         try:
             try:
-                response = requests.get(url)
+                response = requests.get(url, timeout=2)
+            except TimeoutError:
+                self.signals.error_internet.emit(1)
             except:
                 self.signals.error_internet.emit(1)
             else:
                 try:
-                    result = self.fn(*t, **self.kwargs)
+                    result = self.fn(*self.args, **self.kwargs)
 
                     if self.is_kill:
                         raise WorkerKillException
@@ -74,12 +77,14 @@ class ThreadTrans(QRunnable):
         url = "http://www.google.com/"
         try:
             try:
-                response = requests.get(url)
+                response = requests.get(url, timeout=2)
+            except TimeoutError:
+                self.signals.error_internet.emit(1)
             except:
                 self.signals.error_internet.emit(1)
             else:
                 while True:
-                    result = self.fn(*t, **self.kwargs)
+                    result = self.fn(*self.args, **self.kwargs)
                     if self.is_kill:
                         break
                     else:

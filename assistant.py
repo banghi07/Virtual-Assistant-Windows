@@ -102,7 +102,7 @@ class Assistant:
     def speech_recognition(self):
         r = sr.Recognizer()
         with sr.Microphone() as source:
-            audio = r.listen(source, phrase_time_limit=3)
+            audio = r.listen(source, phrase_time_limit=5)
             try:
                 text = r.recognize_google(audio, language="vi-VN")
                 return text.lower()
@@ -155,7 +155,6 @@ class Assistant:
             url = "./icon/no-wifi-256px.png"
             text = "Vui lòng kiểm tra lại Internet."
             self.ui.setupUI_response_window(self.MainWindow, url, text)
-            self.speak_thread(text)
         else:
             pass
 

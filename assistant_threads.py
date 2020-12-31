@@ -3,7 +3,7 @@ import time
 from PyQt5.QtCore import *
 
 
-class WorkerKillException(Exception):
+class KillThread(Exception):
     pass
 
 
@@ -26,8 +26,8 @@ class Thread(QRunnable):
             try:
                 result = self.fn(*self.args, **self.kwargs)
                 if self.is_kill:
-                    raise WorkerKillException
-            except WorkerKillException:
+                    raise KillThread
+            except KillThread:
                 pass
             else:
                 self.signals.result.emit(result)

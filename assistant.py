@@ -347,7 +347,7 @@ class Assistant:
     def play_song_complete(self, result):
         if result:
             self.thread = ThreadDelay(1)
-            self.thread.signals.finished.connect(self.close_window)
+            self.thread.signals.non_args.connect(self.close_window)
             self.threadpool.start(self.thread)
         else:
             self.lost_internet_connection()
@@ -586,7 +586,7 @@ class Assistant:
     def open_website_complete(self):
         self.speak_thread("007")
         self.thread = ThreadDelay(1)
-        self.thread.signals.finished.connect(self.close_window)
+        self.thread.signals.non_args.connect(self.close_window)
         self.threadpool.start(self.thread)
 
     def open_application_thread(self, text):
@@ -632,7 +632,7 @@ class Assistant:
     def open_application_complete(self, result):
         if result:
             self.thread = ThreadDelay(1, "005")
-            self.thread.signals.finished.connect(self.close_window)
+            self.thread.signals.non_args.connect(self.close_window)
             self.thread.signals.args.connect(self.speak_thread)
             self.threadpool.start(self.thread)
 

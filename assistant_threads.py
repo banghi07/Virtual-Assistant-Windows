@@ -1,9 +1,6 @@
 import sys
 import time
 import traceback
-
-import requests
-from requests.exceptions import Timeout
 from PyQt5.QtCore import *
 
 

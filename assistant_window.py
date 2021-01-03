@@ -1327,11 +1327,3 @@ class UI_Windows(object):
 
         label_text_help.setText(text)
         self.layout_help_window.addWidget(label_text_help)
-
-
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     MainWindow = Window()
-#     ui = UI_Windows()
-#     ui.setupUI_help_window(MainWindow)
-#     sys.exit(app.exec_())

@@ -3,7 +3,6 @@ import json
 import os
 import re
 import sys
-import traceback
 import webbrowser
 
 import feedparser
@@ -13,7 +12,7 @@ import speech_recognition as sr
 import wikipedia
 from fast_youtube_search import search_youtube
 from geopy.geocoders import Nominatim
-from googletrans import Translator
+from google_trans_new import google_translator
 from gtts import gTTS, gTTSError
 from playsound import playsound
 from pynput import keyboard, mouse
@@ -21,11 +20,9 @@ from pynput.keyboard import Controller, Key
 from PyQt5.QtWidgets import *
 from youtube_search import YoutubeSearch
 
+from assistant_sys_tray_icon import SystemTrayIcon
 from assistant_threads import *
 from assistant_window import *
-from google_trans_new import google_translator
-from assistant_sys_tray_icon import SystemTrayIcon
-from pprint import pprint
 
 
 class Assistant:
@@ -34,7 +31,6 @@ class Assistant:
         app.setQuitOnLastWindowClosed(False)
 
         self.threadpool = QThreadPool()
-        self.thread_list = []
 
         self.w = QWidget()
         self.tray_icon = SystemTrayIcon(self.w, self)

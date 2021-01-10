@@ -1313,16 +1313,17 @@ class UI_Windows(object):
         label_text_help.setWordWrap(True)
 
         text = """
-        Tôi có thể giúp bạn thực hiện những việc sau:
+
+            Tôi có thể giúp bạn thực hiện những việc sau:
         
-            1. Xem ngày, giờ
-            2. Xem dự báo thời tiết
-            3. Xem tin tức thời sự
-            4. Xem định nghĩa từ với Wikipedia
-            5. Mở video trên Youtube
-            6. Mở một website hoặc phần mềm
-            7. Dịch từ hoặc câu sang tiếng Việt
-            8. Tìm kiếm với Google
+                1. Xem ngày, giờ
+                2. Xem dự báo thời tiết
+                3. Xem tin tức thời sự
+                4. Xem định nghĩa từ với Wikipedia
+                5. Mở video trên Youtube
+                6. Mở một website hoặc phần mềm
+                7. Dịch từ hoặc câu sang tiếng Việt
+                8. Tìm kiếm với Google
         """
 
         label_text_help.setText(text)

@@ -6,9 +6,7 @@ import webbrowser
 
 
 class Window(QMainWindow):
-    def __init__(
-        self,
-    ):
+    def __init__(self):
         super().__init__()
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)

@@ -15,7 +15,7 @@ from geopy.geocoders import Nominatim
 from google_trans_new import google_translator
 from gtts import gTTS, gTTSError
 from playsound import playsound
-from pynput import keyboard, mouse
+from pynput import mouse
 from pynput.keyboard import Controller, Key
 from PyQt5.QtWidgets import *
 from youtube_search import YoutubeSearch
